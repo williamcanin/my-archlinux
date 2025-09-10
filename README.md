@@ -138,6 +138,8 @@ cfdisk /dev/sdX
 
 ## Criando estrutura LVM para o sistema
 
+No **LVM**, precisa criar um **Volume Físico**, **Grupo**, e um **Volume Lógico**.
+
 Gosto de usar **LVM** para ter controle sobre minhas partições. Os comando são:
 
 ```shell
@@ -145,6 +147,8 @@ pvcreate /dev/sda3
 vgcreate linux /dev/sda3
 lvcreate -L 120G linux -n arch
 ```
+
+O nome `linux` é o nome
 
 ## Criando e criptografando a unidade /home
 
@@ -175,4 +179,28 @@ sda
 sdb
 └─sdb1      crypto_LUKS 2                   a4fd06b1-a253-4661-b5a2-47ae92e68efe
   └─home    ext4        1.0                 65660251-8451-4722-adbd-ff5850c5df6d    999,7G    37% /home
+```
+
+## Montagem das unidades
+
+Tudo em ordem, agora faço o `mount` das unidades:
+
+```shell
+mount /dev/mapper/linux-arch /mnt
+mount --mkdir /dev/sda1 /mnt/boot
+mount --mkdir /dev/mapper/home /mnt/home
+```
+
+## Instalando o sistema base do Arch Linux
+
+Aqui eu atualizo os `mirrorlist` para o `Brazil` e `US` usando `reflector` já disponível na ISO do
+**Arch Linux**, e logo em seguida atualizo as chaves e o cache, para depois fazer instalação do
+sistema base com o kernel LTS, e alguns pacotes essenciais.
+
+```shell
+reflector --verbose --country Brazil,US --age 12 --protocol https --sort rate --save /etc/pacman.d/mirrorlist
+pacman -Syy
+pacman -Sy archlinux-keyring
+pacman-key --populate archlinux
+pacstrap -K /mnt base base-devel linux-lts linux-lts-headers linux-firmware xclip sudo vim zsh dhcpcd wireless_tools wpa_supplicant
 ```
