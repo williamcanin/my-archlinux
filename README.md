@@ -16,7 +16,7 @@ for usar algo, tenha consciência se é compatível com seu setup. Não me respo
 dano que sua máquina venha sofrer.
 
 
-## Preparação de Flash Drive
+# Preparação de Flash Drive
 
 Baixe a imagem do Arch Linux em [Arch Linux Download](https://archlinux.org/download/).
 Recomendo usar BitTorrent para evitar corromper a imagem durante o download.
@@ -28,9 +28,9 @@ dd bs=4M if=archlinux-<VERSION>-x86_64.iso of=/dev/sdX conv=fsync oflag=direct s
 
 > Nota: Substitua o sdX pelo do seu flash drive.
 
-## Iniciando a instalação
+# Iniciando a instalação
 
-### Layout
+## Layout
 
 **(1)** - Atribuir layout do teclado para `br-abnt2`:
 
@@ -38,7 +38,7 @@ dd bs=4M if=archlinux-<VERSION>-x86_64.iso of=/dev/sdX conv=fsync oflag=direct s
 loadkeys br-abnt2
 ```
 
-### Conexão com a internet
+## Conexão com a internet
 
 **Via Wi-Fi:**
 
@@ -68,9 +68,9 @@ Apenas conecte o cabo de rede e já terá internet.
 > NOTA: Após configurar a internet, faça um `ping 8.8.8.8`.
 
 
-### Particionamento
+## Particionamento
 
-**Introdução**
+### Sistema
 
 Aqui é a parte MAIS DELICADA, tendo o MÁXIMO de atenção para não escolher a unidade errada.
 Não vou colocar comando de como realizar o particionamento, apenas relatar algumas informações
@@ -79,8 +79,8 @@ importantes e o esboso (tabela) de como o particionamento para a instalação do
 Basicamente o **Arch Linux** precisa apenas de uma partição de boot, a `/boot` do tipo **EFI System**, mas,
 caso queira fazer um dual-boot com outra distro, que necessita de duas
 partições de boot separadas, uma `/boot` do tipo **Linux filesystems** e outra `/boot/efi` do tipo
-**EFI System**, e queira COMPARTILHAR o bootloader, no caso o **systemd-boot** entre ambas, então
-deve instalar o **Arch Linux** com duas partições de boot separadas também.
+**EFI System**, e queira COMPARTILHAR o bootloader, no caso o **systemd-boot** (que eu uso)
+entre ambas, então deve instalar o **Arch Linux** com a partição de boot separado em duas.
 
 * `Relato:`
 Eu usei duas partições de boot separadas porque queria fazer um dual-boot com o **Fedora +42**, porém,
@@ -95,18 +95,20 @@ Geralmente essa configuração é realizada no pos instalação do **Arch Linux*
 nem compartilhamento do **systemd-boot** com outros sistemas, porém, eu vou deixar as duas tabelas
 de como fica ambos os casos, a de uma partição de boot, e a de duas partições de boot.
 
-**Com UMA partição de boot:**
+**Com a partição de boot EFI ÚNICA:**
 
 | Dispositivo | Tamanho |    Tipo     |  Local  |
 |-------------|---------|-------------|---------|
 | /dev/sda1   | 1,5G    | Sistema EFI | /boot   |
 | /dev/sda2   | 221,6G  | Linux LVM   |         |
 
-**Com DUAS partição de boot:**
+**Com a partição de boot EFI SEPARADA:**
 
 | Dispositivo | Tamanho |    Tipo           |  Local    |
 |-------------|---------|-------------------|-----------|
 | /dev/sda1   | 2G      | Linux filesystems | /boot     |
 | /dev/sda2   | 2G      | Sistema EFI       | /boot/efi |
 | /dev/sda3   | 219,1G  | Linux LVM         |           |
+
+### Home
 
