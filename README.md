@@ -18,27 +18,29 @@ dano que sua máquina venha sofrer.
 
 # Preparação de Flash Drive
 
-Baixe a imagem do Arch Linux em [Arch Linux Download](https://archlinux.org/download/).
-Recomendo usar BitTorrent para evitar corromper a imagem durante o download.
-Para grava a imagem, se estiver no Linux, a recomendação é o `dd` com o comando abaixo:
+Baixei a imagem do Arch Linux em [Arch Linux Download](https://archlinux.org/download/).
+Eu uso o BitTorrent para evitar corromper a imagem durante o download, e para gravar a imagem, se
+eu estiver no Linux, uso `dd` com o comando abaixo:
 
 ```shell
 dd bs=4M if=archlinux-<VERSION>-x86_64.iso of=/dev/sdX conv=fsync oflag=direct status=progress
 ```
 
-> Nota: Substitua o sdX pelo do seu flash drive.
+> Nota: Substitua o sdX pelo flash drive real.
 
 # Iniciando a instalação
 
 ## Layout
 
-Atribuir layout do teclado para `br-abnt2`:
+Atribuo layout do teclado para `br-abnt2`, que é o que eu uso:
 
 ```shell
 loadkeys br-abnt2
 ```
 
 ## Conexão com a internet
+
+No momento uso via cabo, mas vou deixar relatado como faço para wif-fi também:
 
 **Via Wi-Fi:**
 
@@ -47,7 +49,7 @@ systemctl start iwd
 iwctl
 ```
 
-Quando entrar dentro do `[iwd]#`, os passos de comandos serão esses basicamente:
+Quando entrar dentro do `[iwd]#`, os passos de comandos que uso serão esses basicamente:
 
 ```shell
 device list
@@ -63,19 +65,27 @@ quit
 
 **Via Cabo:**
 
-Apenas conecte o cabo de rede e já terá internet.
+Apenas conecto o cabo de rede e já tenho internet na ISO do **Arch Linux**.
 
-> NOTA: Após configurar a internet, faça um `ping 8.8.8.8`.
+> NOTA: Após configurar a internet, faço um `ping 8.8.8.8` para verificar.
 
 
 ## Particionamento
 
-### Sistema
-
-Aqui é a parte MAIS DELICADA, tendo o MÁXIMO de atenção para não escolher a unidade errada.
+Aqui é a parte MAIS DELICADA, tenho o MÁXIMO de atenção para não escolher a unidade errada. hehe
 
 Não vou colocar comandos de como realizar o particionamento, apenas relatar algumas informações
 IMPORTANTES e o esboso (tabela) de como o particionamento para a instalação do **Arch Linux** deve ficar.
+
+Para o particionamento eu uso o `cfdisk`, geralmente assim:
+
+```shell
+cfdisk /dev/sdX
+```
+
+> Nota: Substituo o sdX pelo dispositivo real.
+
+### Boot
 
 Basicamente o **Arch Linux** precisa apenas de uma partição de boot, a `/boot` do tipo **EFI System**,
 MAS, caso queira fazer um dual-boot com outra distro, que necessita de duas
@@ -113,3 +123,4 @@ de como fica ambos os casos, a de uma partição de boot, e a de duas partiçõe
 
 ### Home
 
+Tenho
