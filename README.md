@@ -75,15 +75,7 @@ Apenas conecto o cabo de rede e já tenho internet na ISO do **Arch Linux**.
 Aqui é a parte MAIS DELICADA, tenho o MÁXIMO de atenção para não escolher a unidade errada. hehe
 
 Não vou colocar comandos de como realizar o particionamento, apenas relatar algumas informações
-IMPORTANTES e o esboso (tabela) de como o particionamento para a instalação do **Arch Linux** deve ficar.
-
-Para o particionamento eu uso o `cfdisk`, geralmente assim:
-
-```shell
-cfdisk /dev/sdX
-```
-
-> Nota: Substituo o sdX pelo dispositivo real.
+IMPORTANTES e o esboço (tabela) de como o particionamento para a instalação do **Arch Linux** deve ficar.
 
 ### Boot
 
@@ -106,21 +98,81 @@ Geralmente essa configuração é realizada no pos instalação do **Arch Linux*
 nem compartilhamento do **systemd-boot** com outros sistemas, porém, eu vou deixar as duas tabelas
 de como fica ambos os casos, a de uma partição de boot, e a de duas partições de boot.
 
-**Com a partição de boot EFI ÚNICA:**
+### Sistema
 
-| Dispositivo | Tamanho |    Tipo     |  Local  |
-|-------------|---------|-------------|---------|
-| /dev/sda1   | 1,5G    | Sistema EFI | /boot   |
-| /dev/sda2   | 221,6G  | Linux LVM   |         |
-
-**Com a partição de boot EFI SEPARADA:**
-
-| Dispositivo | Tamanho |    Tipo           |  Local    |
-|-------------|---------|-------------------|-----------|
-| /dev/sda1   | 2G      | Linux filesystems | /boot     |
-| /dev/sda2   | 2G      | Sistema EFI       | /boot/efi |
-| /dev/sda3   | 219,1G  | Linux LVM         |           |
+Instalo o **Arch Linux** em um SSD de 250 Gigabytes (250Gb), mas eu apenas deixo 120Gb, não uso mais
+que isso para o sistema. Atualmente estou usando o sistema de arquivo `ext4`.
 
 ### Home
 
-Tenho
+Tenho um HDD de 1 Terabyte (1Tb) para minha `/home`, e criptografo a mesma usando o LUKS (dm_crypt),
+com o sistema de arquivos `ext4`.
+
+### Esboço
+
+**Com a partição de boot EFI ÚNICA:**
+
+| Dispositivo | Tamanho |    Tipo             |  Local  |
+|-------------|---------|---------------------|---------|
+| /dev/sda1   | 1,5G    | Sistema EFI         | /boot   |
+| /dev/sda2   | 120G    | Linux LVM           |         |
+| /dev/sdb1   | 1T      | Linux filesystems   | /home   |
+
+**Com a partição de boot EFI SEPARADA:**
+
+| Dispositivo | Tamanho |    Tipo             |  Local    |
+|-------------|---------|---------------------|-----------|
+| /dev/sda1   | 2G      | Linux filesystems   | /boot     |
+| /dev/sda2   | 2G      | Sistema EFI         | /boot/efi |
+| /dev/sda3   | 120G    | Linux LVM           |           |
+| /dev/sdb1   | 1T      | Linux filesystems   | /home     |
+
+Para o particionamento, geralmente eu uso o `cfdisk`, assim:
+
+```shell
+cfdisk /dev/sdX
+```
+
+> Nota: Substituo o sdX pelo dispositivo real, `/dev/sda` e `/dev/sdb`.
+
+
+## Criando estrutura LVM para o sistema
+
+Gosto de usar **LVM** para ter controle sobre minhas partições. Os comando são:
+
+```shell
+pvcreate /dev/sda3
+vgcreate linux /dev/sda3
+lvcreate -L 120G linux -n arch
+```
+
+## Criando e criptografando a unidade /home
+
+```shell
+cryptsetup -y -v luksFormat /dev/sdb1
+cryptsetup open /dev/sdb1 home
+```
+
+## Formatação
+
+Agora formato cada unidade que foi criada:
+
+```shell
+mkfs.fat -F 32 /dev/sda1
+mkfs -t ext4 /dev/mapper/linux-arch
+mkfs -t ext4 /dev/mapper/home
+```
+
+Depois de todas unidades estarem criadas e formatadas, gosto de verificar com o comando: `lsblk -f`:
+
+```
+NAME        FSTYPE      FSVER     LABEL     UUID                                   FSAVAIL FSUSE% MOUNTPOINTS
+sda
+├─sda1      vfat        FAT32               BA60-4D21                                 1,5G    12% /boot
+└─sda2      LVM2_member LVM2 001            8YUXnI-FwmY-Vc8V-fUHy-cVdF-zi9X-MDAK0s
+  └──linux-arch
+           ext4        1.0                  0a73a608-5260-45c8-9bdd-8285c4a4a84b     89,8G    44% /
+sdb
+└─sdb1      crypto_LUKS 2                   a4fd06b1-a253-4661-b5a2-47ae92e68efe
+  └─home    ext4        1.0                 65660251-8451-4722-adbd-ff5850c5df6d    999,7G    37% /home
+```
