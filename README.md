@@ -23,8 +23,10 @@ Recomendo usar BitTorrent para evitar corromper a imagem durante o download.
 Para grava a imagem, se estiver no Linux, a recomendação é o `dd` com o comando abaixo:
 
 ```shell
-dd bs=4M if=rchlinux-<VERSION>-x86_64.iso of=/dev/disk/by-id/usb-My_flash_drive conv=fsync oflag=direct status=progress
+dd bs=4M if=rchlinux-<VERSION>-x86_64.iso of=/dev/sdX conv=fsync oflag=direct status=progress
 ```
+
+> Nota: Substitua o sdX pelo do seu flash drive.
 
 ## Iniciando a instalação
 
