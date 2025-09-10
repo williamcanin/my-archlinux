@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+# Local: /etc/initcpio/post/90-systemd-boot
+# Enable: chmod +x /etc/initcpio/post/90-systemd-boot
+
+	set -euo pipefail
+
+	ESP_DIR="/boot/efi/arch"
+
+	# message color
+	message () {
+	  printf "\e[0;32m==>\e[0m\e[0;36m %s\e[0m\n" "$1"
+    }
+
+	# arguments: <kernel> <image> [uki]
+	kernel="$1"
+	img="$2"
+	uki="${3:-}"
+
+	# If kernel is empty, use KERNELDESTINATION (variable exported by mkinitcpio)
+	if [[ -z "${kernel}" && -n "${KERNELDESTINATION:-}" ]]; then
+	  kernel="$KERNELDESTINATION"
+	fi
+
+	mkdir -p "$ESP_DIR"
+
+	# copies the kernel (if provided)
+	if [[ -n "$kernel" && -f "$kernel" ]]; then
+	  cp -f "$kernel" "$ESP_DIR/$(basename "$kernel")"
+	fi
+
+	# copies the initramfs that was just generated
+	if [[ -n "$img" && -f "$img" ]]; then
+	  cp -f "$img" "$ESP_DIR/$(basename "$img")"
+	fi
+
+	# tries to copy the fallback (if it exists)
+	fallback="/boot/$(basename "${img%.*}-fallback.img")"
+	if [[ -f "$fallback" ]]; then
+	  cp -f "$fallback" "$ESP_DIR/$(basename "$fallback")"
+	fi
+
+	# copy microcode if present
+	for u in /boot/*-ucode.img /boot/intel-ucode.img /boot/amd-ucode.img; do
+	  [[ -f "$u" ]] || continue
+	  cp -f "$u" "$ESP_DIR/$(basename "$u")"
+	done
+
+	message "Post-hook: Files copied to $ESP_DIR"
+	exit 0

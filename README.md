@@ -70,4 +70,43 @@ Apenas conecte o cabo de rede e já terá internet.
 
 ### Particionamento
 
+**Introdução**
+
+Aqui é a parte MAIS DELICADA, tendo o MÁXIMO de atenção para não escolher a unidade errada.
+Não vou colocar comando de como realizar o particionamento, apenas relatar algumas informações
+importantes e o esboso (tabela) de como o particionamento para a instalação do **Arch Linux** deve ficar.
+
+Basicamente o **Arch Linux** precisa apenas de uma partição de boot, a `/boot` do tipo **EFI System**, mas,
+caso queira fazer um dual-boot com outra distro, que necessita de duas
+partições de boot separadas, uma `/boot` do tipo **Linux filesystems** e outra `/boot/efi` do tipo
+**EFI System**, e queira COMPARTILHAR o bootloader, no caso o **systemd-boot** entre ambas, então
+deve instalar o **Arch Linux** com duas partições de boot separadas também.
+
+* `Relato:`
+Eu usei duas partições de boot separadas porque queria fazer um dual-boot com o **Fedora +42**, porém,
+ao fazer isso, toda vez que atualizava o **Arch Linux** e gerava uma nova modificação do **vmlinuz-linux**
+e **initramfs-linux.img**, tinha que fazer uma copia de ambos para a partição **EFI**, no caso, a `/boot/efi`,
+isso porque quando esses dois arquivos são gerados/modificados, eles "instalam" por padrão em `/boot`,
+e o **systemd-boot** não consegue reconhecer "nada" fora do `/boot/efi`, por isso é NECESSÁRIO a
+copia.
+* Para fazer essa copia automatizada, eu tive que criar [este hooks](https://github.com/williamcanin/my-archlinux/blob/main/hooks/90-systemd-boot) em `/etc/initcpio/post/90-systemd-boot`.
+Geralmente essa configuração é realizada no pos instalação do **Arch Linux**, mas vou deixar relatado aqui mesmo.
+* Sabendo disso, nesses guias NÃO VOU USAR duas partição de boot porque não quero fazer dual-boot e
+nem compartilhamento do **systemd-boot** com outros sistemas, porém, eu vou deixar as duas tabelas
+de como fica ambos os casos, a de uma partição de boot, e a de duas partições de boot.
+
+**Com UMA partição de boot:**
+
+| Dispositivo | Tamanho |    Tipo     |  Local  |
+|-------------|---------|-------------|---------|
+| /dev/sda1   | 1,5G    | Sistema EFI | /boot   |
+| /dev/sda2   | 221,6G  | Linux LVM   |         |
+
+**Com DUAS partição de boot:**
+
+| Dispositivo | Tamanho |    Tipo           |  Local    |
+|-------------|---------|-------------------|-----------|
+| /dev/sda1   | 2G      | Linux filesystems | /boot     |
+| /dev/sda2   | 2G      | Sistema EFI       | /boot/efi |
+| /dev/sda3   | 219,1G  | Linux LVM         |           |
 
