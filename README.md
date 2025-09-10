@@ -138,9 +138,11 @@ cfdisk /dev/sdX
 
 ## Criando estrutura LVM para o sistema
 
-No **LVM**, precisa criar um **Volume Físico**, **Grupo**, e um **Volume Lógico**.
+No **LVM**, precisa criar um **Volume Físico** (PV), **Grupo** (VG), e um **Volume Lógico** (LV),
+onde o grupo vai fazer parte de um volume físico, e o volume lógico vai estar dentro de um grupo.
 
-Gosto de usar **LVM** para ter controle sobre minhas partições. Os comando são:
+Gosto de usar **LVM** para ter controle sobre minhas partições, caso eu queira aumentar ou diminuir
+sem ter problema de corromper dados. Para isso, os comando uso são simples:
 
 ```shell
 pvcreate /dev/sda3
@@ -148,7 +150,8 @@ vgcreate linux /dev/sda3
 lvcreate -L 120G linux -n arch
 ```
 
-O nome `linux` é o nome
+> NOTA: No segundo comando, o nome `linux` é o nome do grupo que defino (pode ser qualquer nome), no
+terceiro comando, crio um volume lógico especificando o grupo (`linux`).
 
 ## Criando e criptografando a unidade /home
 
