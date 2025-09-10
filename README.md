@@ -4,7 +4,7 @@
   </a>
 </h1>
 
-Este é o guia fiz, e uso atualmente para instalar o [Arch Linux](https://archlinux.org/) em
+Este é o guia que fiz, e uso atualmente para instalar o [Arch Linux](https://archlinux.org/) em
 minha máquina.
 
 Este guia irá ter detalhes e comentários RESUMIDO de cada comando, caso queira um guia com apenas os
@@ -19,7 +19,7 @@ dano que sua máquina venha sofrer.
 ## Preparação de Flash Drive
 
 Baixe a imagem do Arch Linux em [Arch Linux Download](https://archlinux.org/download/).
-Recomendado usar BitTorrent para evitar corromper a imagem durante o download.
+Recomendo usar BitTorrent para evitar corromper a imagem durante o download.
 Para grava a imagem, se estiver no Linux, a recomendação é o `dd` com o comando abaixo:
 
 ```shell
