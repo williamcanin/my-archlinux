@@ -1,0 +1,7 @@
+# Default
+temp/
+tmp/
+pkg/
+~*
+*.old
+
