@@ -1,6 +1,6 @@
 <h1 align="center">
   <a href="https://github.com/williamcanin/my-archlinux">
-    <img alt="Arch Linux" src="https://raw.githubusercontent.com/williamcanin/my-archlinux/refs/heads/main/docs/archlinux.png" width="480">
+    <img alt="Arch Linux" src="https://raw.githubusercontent.com/williamcanin/my-archlinux/refs/heads/main/assets/archlinux.png" width="480">
   </a>
 </h1>
 
@@ -195,12 +195,110 @@ mount --mkdir /dev/mapper/home /mnt/home
 
 Aqui eu atualizo os `mirrorlist` para o `Brazil` e `US` usando `reflector` já disponível na ISO do
 **Arch Linux**, e logo em seguida atualizo as chaves e o cache, para depois fazer instalação do
-sistema base com o kernel LTS, e alguns pacotes essenciais.
+sistema base com o kernel LTS, e alguns pacotes que acho essenciais durante a instalação.
 
 ```shell
 reflector --verbose --country Brazil,US --age 12 --protocol https --sort rate --save /etc/pacman.d/mirrorlist
 pacman -Syy
 pacman -Sy archlinux-keyring
 pacman-key --populate archlinux
-pacstrap -K /mnt base base-devel linux-lts linux-lts-headers linux-firmware xclip sudo vim zsh dhcpcd wireless_tools wpa_supplicant
+pacstrap -K /mnt base base-devel linux-lts linux-lts-headers linux-firmware xclip sudo vim dhcpcd wireless_tools wpa_supplicant
+```
+
+## Gerando o /etc/fstab
+
+Aqui não tem muito o que dizer, apenas geramos o `/etc/fstab` para que todas nossas partições montadas
+sejam configuradas durando o boot da máquina.
+
+
+```shell
+genfstab -U -p /mnt >> /mnt/etc/fstab
+```
+
+## Entrando no sistema pré-instalado
+
+```shell
+arch-chroot /mnt /bin/bash
+```
+
+### Atenrando senha de root
+
+A primeira coisa que gosto de fazer é alterar a senha de root:
+
+```shell
+passwd
+```
+
+### Configurando o Pacman
+
+Aqui habilito o repositório `[multilib]` e ignoro alguns pacotes de serem instalados e atualizados.
+
+Como eu uso kernel *LTS*, não tenho mania de ficar atualizando kernel sempre, e também
+não uso os driver da minha GPU (**NVIDIA**) diretamente do repo do **Arch Linux**. Como o **Arch Linux** é
+rolling-release e sempre disponibiliza a "última" versão dos pacotes, tive alguns problemas com
+a útilma versão da **NVIDIA** em relação a minha GPU, então instalo o driver (`.run`) baixado do próprio
+[site da NVIDIA](https://www.nvidia.com/en-us/drivers/unix/) com uma versão anterior, mas especificamente
+a *Latest New Feature Branch Version*.
+
+**(1)** - Abro o **/etc/pacman.conf**:
+
+```shell
+vim /etc/pacman.conf
+```
+
+**(2)** - Descomento as seguintes linhas do `[multilib]` deixando assim:
+
+```
+[multilib]
+Include = /etc/pacman.d/mirrorlist
+```
+
+**(3)** - Atualizo o cache do pacman:
+
+```shell
+pacman -Syy
+```
+
+### Configurando a rede de internet
+
+Como atualmente uso uma conexão via cabo, não tenho necessidade de usar o `NetworkManager` como
+gerenciador de conexão com internet. Acho ele um pouco pesado em consumo de memória pra uma conexão
+muito específica.
+
+Então, eu uso o `systemd-networkd`, e para configurar faço assim:
+
+**(1)** - Caso eu já tenho o `NetworkManager` instalado, eu apenas desabilito e faço o `mask`:
+
+```shell
+systemctl disable --now NetworkManager.service
+systemctl mask NetworkManager.service
+```
+
+**(2)** - Habilito o `systemd-networkd` e `systemd-resolved`:
+
+```shell
+systemctl enable --now systemd-networkd.service systemd-resolved.service
+```
+
+**(3)** - Abro o arquivo de configuração do `systemd-networkd` e coloco o seguinte:
+
+```conf
+[Match]
+Name=eno1 # Replace with the name of your interface
+
+[Network]
+Address=192.168.0.2/24
+Gateway=192.168.0.1
+DNS=8.8.8.8
+
+## Conection DHCP
+# [Network]
+# DHCP=yes
+```
+
+
+**(4)** - Depois crio um link simbólico para o `DNS`:
+
+```shell
+ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 ```
