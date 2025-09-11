@@ -30,6 +30,8 @@ dd bs=4M if=archlinux-<VERSION>-x86_64.iso of=/dev/sdX conv=fsync oflag=direct s
 
 # Iniciando a instalação
 
+Quando já estou dentro da ISO do **Arch Linux**, sigo esses passos:
+
 ## Layout
 
 Atribuo layout do teclado para `br-abnt2`, que é o que eu uso:
@@ -40,9 +42,14 @@ loadkeys br-abnt2
 
 ## Conexão com a internet
 
-No momento uso via cabo, mas vou deixar relatado como faço para wif-fi também:
+**Via Cabo:**
 
-**Via Wi-Fi:**
+Apenas conecto o cabo de rede e já tenho internet na ISO do **Arch Linux**.
+
+> NOTA: Após configurar a internet, faço um `ping 8.8.8.8` para verificar.
+
+<details>
+  <summary>Via Wi-Fi:</summary>
 
 ```shell
 systemctl start iwd
@@ -62,13 +69,7 @@ station <IFACE_NAME> connect '<NETWORK_NAME>'
 Passphrase:
 quit
 ```
-
-**Via Cabo:**
-
-Apenas conecto o cabo de rede e já tenho internet na ISO do **Arch Linux**.
-
-> NOTA: Após configurar a internet, faço um `ping 8.8.8.8` para verificar.
-
+</details>
 
 ## Particionamento
 
