@@ -142,7 +142,7 @@ No **LVM**, precisa criar um **Volume Físico** (PV), **Grupo** (VG), e um **Vol
 onde o grupo vai fazer parte de um volume físico, e o volume lógico vai estar dentro de um grupo.
 
 Gosto de usar **LVM** para ter controle sobre minhas partições, caso eu queira aumentar ou diminuir
-sem ter problema de corromper dados. Para isso, os comando uso são simples:
+sem ter problema de corromper dados. Para isso, os comando que uso são simples:
 
 ```shell
 pvcreate /dev/sda3
@@ -212,7 +212,7 @@ pacstrap -K /mnt base base-devel linux-lts linux-lts-headers linux-firmware sudo
 
 ## Gerando o /etc/fstab
 
-Aqui não tem muito o que dizer, apenas geramos o `/etc/fstab` para que todas nossas partições montadas
+Aqui não tenho muito o que dizer, apenas gero o `/etc/fstab` para que todas minhas partições montadas
 sejam configuradas durando o boot da máquina.
 
 
@@ -226,9 +226,9 @@ genfstab -U -p /mnt >> /mnt/etc/fstab
 arch-chroot /mnt /bin/bash
 ```
 
-### Atenrando senha de root
+### Atribuindo senha de `root`
 
-A primeira coisa que gosto de fazer é alterar a senha de root:
+A primeira coisa que gosto de fazer é atribuir uma senha para o usuário `root`:
 
 ```shell
 passwd
@@ -238,7 +238,7 @@ passwd
 
 Aqui habilito o repositório `[multilib]` e ignoro alguns pacotes de serem instalados e atualizados.
 
-Como eu uso kernel *LTS*, não tenho mania de ficar atualizando kernel sempre, e também
+> NOTA: Como eu uso kernel *LTS*, não tenho mania de ficar atualizando kernel sempre, e também
 não uso os driver da minha GPU (**NVIDIA**) diretamente do repo do **Arch Linux**. Como o **Arch Linux** é
 rolling-release e sempre disponibiliza a "última" versão dos pacotes, tive alguns problemas com
 a útilma versão da **NVIDIA** em relação a minha GPU, então instalo o driver (`.run`) baixado do próprio
@@ -253,12 +253,20 @@ vim /etc/pacman.conf
 
 **(2)** - Descomento as seguintes linhas do `[multilib]` deixando assim:
 
-```
+```conf
 [multilib]
 Include = /etc/pacman.d/mirrorlist
 ```
 
-**(3)** - Atualizo o cache do pacman:
+**(3)** - Ignoro atualização/instalação de alguns pacotes do repo do **Arch Linux** que não uso,
+adicionando as seguintes linhas:
+
+```conf
+IgnorePkg  = linux-lts linux linux-zen linux-headers linux-zen-headers linux-lts-headers
+nvidia-utils nvidia-settings nvidia lib32-nvidia cuda
+```
+
+**(4)** - Atualizo o cache do pacman:
 
 ```shell
 pacman -Syy
@@ -267,7 +275,8 @@ pacman -Syy
 ### Configurando a rede de internet
 
 Como atualmente uso uma conexão via cabo, não tenho necessidade de usar o `NetworkManager` como
-gerenciador de conexão com internet. Acho ele um pouco pesado em consumo de memória pra uma conexão
+gerenciador de conexão com internet para ficar me dando várias configurações. Eu apenas quero
+me conectar e pronto. Acho ele um pouco pesado em consumo de memória pra uma conexão
 muito específica.
 
 Então, eu uso o `systemd-networkd`, e para configurar faço assim:
@@ -289,14 +298,14 @@ systemctl enable --now systemd-networkd.service systemd-resolved.service
 
 ```conf
 [Match]
-Name=eno1 # Replace with the name of your interface
+Name=eno1 # Nome da minha interface de rede
 
 [Network]
 Address=192.168.0.2/24
 Gateway=192.168.0.1
 DNS=8.8.8.8
 
-## Conection DHCP
+## Conexão via DHCP
 # [Network]
 # DHCP=yes
 ```
@@ -310,27 +319,29 @@ ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 
 ### Configurando /home criptografado
 
-O arquivo de configuração para dispositivos criptografados lançados durante o boot no **Arch Linux**,
+O arquivo de configuração para dispositivos criptografados lançados "durante o boot" no **Arch Linux**,
 é o `/etc/crypttab.initramfs`. Por padrão ele não existe, então eu crio o mesmo atribuindo o `UUID` do
-dispositivo criptografado LUKS, que no caso é o `/dev/sdb1` com os comandos:
+dispositivo criptografado LUKS, que no caso é o `/dev/sdb1`.
 
-**(1)** - Agora crio o arquivo `/etc/crypttab.initramfs` com o comando:
+**(1)** - Crio o arquivo `/etc/crypttab.initramfs` inserindo o `UUID` com a ajuda do `blkid`:
 
 ```shell
-echo "\n\n#/dev/sdb1" | tee /etc/fstab
+echo "\n\n #/dev/sdb1" | tee /etc/crypttab.initramfs
 echo "home UUID=$(blkid -s UUID -o value /dev/sdb1) none luks,tries=0,timeout=0" | tee -a /etc/crypttab.initramfs
 ```
 
-> ATENÇÃO!!! Não confundir `/dev/sdb1` (LUKS) com `/dev/mapper/home` (partição).
+> ATENÇÃO!!! Não confundir `/dev/sdb1` (dispositivo LUKS) com `/dev/mapper/home` (partição com sistema de arquivos).
 
-**(2)** - Agora precisa colocar o `/dev/mapper/home` para iniciar com o sistema no arquivo
-`/etc/fstab`. Primeiro sigo o mesmo passo de cima, copiando o `UUID` mas dessa vez do `/etc/fstab`:
+**(2)** - Agora para a partição `/dev/mapper/home` iniciar com o sistema, insiro a mesma no arquivo
+`/etc/fstab`. Sigo basicamente a mesma ideia do comando de acima, copiando o `UUID` com o `blkid` mas dessa vez no `/etc/fstab`:
 
 ```shell
-echo "\n\n#/dev/mapper/home" | tee -a /etc/fstab
+echo "\n\n #/dev/mapper/home" | tee -a /etc/fstab
 echo "UUID=$(blkid -s UUID -o value /dev/mapper/home) /home ext4 rw,relatime,data=ordered 0 2" | tee -a /etc/fstab
 ```
 
 > ATENÇÃO!!! Observe que para inserir a configuração no `/etc/fstab`, estou usando **tee -a**, este
 parâmetro **-a** significa **append**, adicionar, se emitir ele, irá sobrescrever o `/etc/fstab`.
+
+### Configurando HOOKS do /etc/mkinitcpio.conf
 
