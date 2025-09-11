@@ -76,7 +76,19 @@ quit
 Aqui é a parte MAIS DELICADA, tenho o MÁXIMO de atenção para não escolher a unidade errada. hehe
 
 Não vou colocar comandos de como realizar o particionamento, apenas relatar algumas informações
-IMPORTANTES e o esboço (tabela) de como o particionamento para a instalação do **Arch Linux** deve ficar.
+IMPORTANTES e o esboço (tabela) de como o particionamento para a instalação do **Arch Linux** fica
+em minha máquina.
+
+### Tabela
+
+| Dispositivo | Tamanho |    Tipo             |  Local  |
+|-------------|---------|---------------------|---------|
+| /dev/sda1   | 1,5G    | Sistema EFI         | /boot   |
+| /dev/sda2   | 120G    | Linux LVM           |         |
+| /dev/sdb1   | 1T      | Linux filesystems   | /home   |
+
+<details>
+  <summary><strong>>> Informações</strong></summary>
 
 ### Boot
 
@@ -109,18 +121,7 @@ que isso para o sistema. Atualmente estou usando o sistema de arquivo `ext4`.
 Tenho um HDD de 1 Terabyte (1Tb) para minha `/home`, e criptografo a mesma usando o LUKS (dm_crypt),
 com o sistema de arquivos `ext4`.
 
-### Esboço
-
-**Com a partição de boot EFI ÚNICA:**
-
-| Dispositivo | Tamanho |    Tipo             |  Local  |
-|-------------|---------|---------------------|---------|
-| /dev/sda1   | 1,5G    | Sistema EFI         | /boot   |
-| /dev/sda2   | 120G    | Linux LVM           |         |
-| /dev/sdb1   | 1T      | Linux filesystems   | /home   |
-
-<details>
-  <summary>Com a partição de boot EFI SEPARADA</summary>
+**Tabela com a partição de boot separada em duas:**
 
 | Dispositivo | Tamanho |    Tipo             |  Local    |
 |-------------|---------|---------------------|-----------|
@@ -131,7 +132,7 @@ com o sistema de arquivos `ext4`.
 
 </details>
 
-Para o particionamento, geralmente eu uso o `cfdisk`, assim:
+Para realizar o particionamento, geralmente eu uso o `cfdisk`:
 
 ```shell
 cfdisk /dev/sdX
