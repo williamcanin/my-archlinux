@@ -453,7 +453,17 @@ pacman -S --noconfirm efibootmgr intel-ucode
 bootctl --path=/boot install
 ```
 
-**(3)** - Abro o `/etc/mkinitcpio.d/linux-lts.preset` com `vim` e adiciono a configuração abaixo:
+**(3)** - Crio o loader do `systemd-boot`:
+
+```shell
+ESP_DIR="/boot"
+echo "default arch.conf\ntimeout 3\nconsole-mode max\neditor no" | tee $ESP_DIR/loader/loader.conf
+```
+
+> IMPORTANTE: Se eu usar a EFI fora do `/boot`, em `/boot/efi` futuramente, deixo assim
+`ESP_DIR="/boot/efi"`.
+
+**(4)** - Abro o `/etc/mkinitcpio.d/linux-lts.preset` com `vim` e adiciono a configuração abaixo:
 
 ```conf
 ESP_DIR="<ESP_DIR>"
@@ -482,13 +492,9 @@ de `keymap`.
 **(4)** - Altero o `<UUID>` pelo `UUID` da partição `/dev/mapper/linux-arch` com os comandos:
 
 ```shell
-ESP_DIR="/boot"
 sed -i "s|<ESP_DIR>|$ESP_DIR|g" /etc/mkinitcpio.d/linux-lts.preset
 sed -i "s|<UUID>|$(blkid -s UUID -o value /dev/mapper/linux-arch)|g" /etc/mkinitcpio.d/linux-lts.preset
 ```
-
-> IMPORTANTE: Se eu usar a EFI fora do `/boot`, em `/boot/efi` futuramente, deixo assim
-`ESP_DIR="/boot/efi"`.
 
 **(5)** - Agora crio as entradas do `systemd-boot` padrão:
 
