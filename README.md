@@ -177,6 +177,17 @@ mkfs -t ext4 /dev/mapper/linux-arch
 mkfs -t ext4 /dev/mapper/home
 ```
 
+<details>
+  <summary><strong>Com partição de boot separada</strong></summary>
+
+```shell
+mkfs -t ext4 /dev/sda1
+mkfs.fat -F 32 /dev/sda2
+mkfs -t ext4 /dev/mapper/linux-arch
+mkfs -t ext4 /dev/mapper/home
+```
+</details></br>
+
 > IMPORTANTE! Se já tiver a partição `/dev/mapper/home`, não formatar senão perde TODOS os dados.
 
 Depois de todas unidades estarem criadas e formatadas, gosto de verificar com o comando: `lsblk -f`:
@@ -202,6 +213,17 @@ mount /dev/mapper/linux-arch /mnt
 mount --mkdir /dev/sda1 /mnt/boot
 mount --mkdir /dev/mapper/home /mnt/home
 ```
+
+<details>
+  <summary><strong>Com partição de boot separada</strong></summary>
+
+```shell
+mount /dev/mapper/linux-arch /mnt
+mount --mkdir /dev/sda1 /mnt/boot
+mount --mkdir /dev/sda2 /mnt/boot/efi
+mount --mkdir /dev/mapper/home /mnt/home
+```
+</details></br>
 
 ## Instalando o sistema base do Arch Linux
 
@@ -407,44 +429,51 @@ bootctl --path=/boot install
 **(3)** - Abro o `/etc/mkinitcpio.d/linux-lts.preset` com `vim` e adiciono a configuração abaixo:
 
 ```conf
+ESP_DIR="<ESP_DIR>"
+
 ALL_config="/etc/mkinitcpio.conf"
-ALL_kver="/boot/vmlinuz-linux-lts"
+ALL_kver="${ESP_DIR}/vmlinuz-linux-lts"
 ALL_cmdline="root=UUID=<UUID> rw loglevel=3 nvidia_drm.modeset=1 video=1920x1080@75"
 PRESETS=('default' 'fallback')
 
 default_config="/etc/mkinitcpio.conf"
-default_image="/boot/initramfs-linux-lts.img"
-default_uki="/boot/EFI/Linux/arch-linux-lts.efi"
+default_image="${ESP_DIR}/initramfs-linux-lts.img"
+default_uki="${ESP_DIR}/EFI/Linux/arch-linux-lts.efi"
 default_options="--splash /usr/share/systemd/bootctl/splash-arch.bmp"
 
 fallback_config="/etc/mkinitcpio.conf"
-fallback_image="/boot/initramfs-linux-lts-fallback.img"
-fallback_uki="/boot/EFI/Linux/arch-linux-lts-fallback.efi"
+fallback_image="${ESP_DIR}/initramfs-linux-lts-fallback.img"
+fallback_uki="${ESP_DIR}/EFI/Linux/arch-linux-lts-fallback.efi"
 fallback_options="-S autodetect"
 ```
 
 **(4)** - Altero o `<UUID>` pelo `UUID` da partição `/dev/mapper/linux-arch` com o comando:
 
 ```shell
+ESP_DIR="/boot"
+sed -i "s|<ESP_DIR>|$ESP_DIR|g" /etc/mkinitcpio.d/linux-lts.preset
 sed -i "s|<UUID>|$(blkid -s UUID -o value /dev/mapper/linux-arch)|g" /etc/mkinitcpio.d/linux-lts.preset
 ```
+
+> IMPORTANTE: Se usa a EFI fora do `/boot`, em `/boot/efi`, deixe assim `ESP_DIR="/boot/efi"`.
 
 **(5)** - Crio as entradas do `systemd-boot` padrão:
 
 ```shell
+
 echo "title   Arch Linux LTS" | tee -a /boot/loader/entries/arch.conf
-echo "efi     /boot/EFI/Linux/arch-linux-lts.efi" | tee -a /boot/loader/entries/arch.conf
+echo "efi     $ESP_DIR/EFI/Linux/arch-linux-lts.efi" | tee -a /boot/loader/entries/arch.conf
 ```
 
 **(6)** - Crio as entradas do `systemd-boot` de fallback:
 
 ```shell
 echo "title   Arch Linux LTS (Fallback)" | tee -a /boot/loader/entries/arch-fallback.conf
-echo "efi     /boot/EFI/Linux/arch-linux-lts-fallback.efi" | tee -a /boot/loader/entries/arch-fallback.conf
+echo "efi     $ESP_DIR/EFI/Linux/arch-linux-lts-fallback.efi" | tee -a /boot/loader/entries/arch-fallback.conf
 ```
 
-**(7)** - Gero as imagens de `.efi`:
+**(7)** - Reinstalo o kernel:
 
 ```shell
-mkinitcpio -P
+pacman -S --noconfirm linux-lts
 ```
