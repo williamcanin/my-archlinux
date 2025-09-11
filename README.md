@@ -93,13 +93,14 @@ em minha máquina.
 ### Boot
 
 O **Arch Linux** precisa apenas de uma partição de boot, a `/boot` do tipo **EFI System**,
-MAS, caso queira fazer um dual-boot com outra distro, que necessita de duas
+MAS, caso queira fazer um dual-boot com outras distros, que necessita de duas
 partições de boot separadas, uma `/boot` do tipo **Linux filesystems** e outra `/boot/efi` do tipo
-**EFI System**, e queira COMPARTILHAR o bootloader, no caso o **systemd-boot** (que eu uso)
-entre ambas, então deve instalar o **Arch Linux** com a partição de boot separada em duas também.
+**EFI System**, por exemplo, **Fedora 42**, e queira COMPARTILHAR o bootloader, no caso o
+**systemd-boot** (que eu uso) entre ambas, então deve instalar o **Arch Linux** com a partição de
+boot separada em duas também.
 
-Toda vez que o **Arch Linux** gera o **vmlinuz-linux-lts** e **initramfs-linux-lts.img**, ele gera
-no diretorio `/boot`, isso porque a configuração padrão é para esté diretório, mas com a EFI
+Toda vez que o **Arch Linux** gera o "**vmlinuz-linux-lts**" e "**initramfs-linux-lts.img**", ele
+gera no diretorio `/boot`, isso porque a configuração padrão é para esté diretório, mas com a EFI
 apontando para `/boot/efi`, tive que modificar essa configuração no arquivo
 `/etc/mkinitcpio.d/linux-lts.preset` e reinstalar o kernel. Na seção de
 **Instalando o bootloader systemd-boot** você irá ver informações sobre essa modificação.
@@ -110,13 +111,14 @@ precisa fazer caso seja uma instalação com `/boot` e `/boot/efi`.
 
 ### Sistema
 
-Instalo o **Arch Linux** em um SSD de 250 Gigabytes (250Gb), mas eu apenas deixo 120Gb, não uso mais
-que isso para o sistema. Atualmente estou usando o sistema de arquivo `ext4`.
+Instalo o **Arch Linux** em um SSD de **250 Gigabytes** (*250Gb*), mas eu apenas deixo **120Gb**,
+não uso mais que isso para o sistema **Arch Linux**. Atualmente estou usando o sistema de
+arquivo `ext4`.
 
 ### Home
 
-Tenho um HDD de 1 Terabyte (1Tb) para minha `/home`, e criptografo a mesma usando o LUKS (dm_crypt),
-com o sistema de arquivos `ext4`.
+Tenho um HDD de **1 Terabyte** (*1Tb*) para minha `/home`, e criptografo a mesma usando o
+LUKS (*dm_crypt*), com o sistema de arquivos `ext4`.
 
 ### Tabela
 
@@ -303,14 +305,22 @@ Include = /etc/pacman.d/mirrorlist
 ```
 
 **(3)** - Ignoro atualização/instalação de alguns pacotes do repo do **Arch Linux** que não uso,
-adicionando as seguintes linhas:
+adicionando o seguintes:
 
 ```conf
 IgnorePkg  = linux-lts linux linux-zen linux-headers linux-zen-headers linux-lts-headers
 nvidia-utils nvidia-settings nvidia lib32-nvidia cuda
 ```
 
-**(4)** - Atualizo o cache do pacman:
+**(4)** - Adiciono meu próprio repo de algumas configurações que fiz para minha máquina:
+
+```conf
+[canin]
+SigLevel = Optional TrustAll
+Server = https://williamcanin.gitlab.io/archlinux/stable/x86_64
+```
+
+**(5)** - Atualizo o cache do pacman:
 
 ```shell
 pacman -Syy
@@ -319,11 +329,11 @@ pacman -Syy
 ### Configurando a rede de internet
 
 Como atualmente uso uma conexão via cabo, não tenho necessidade de usar o `NetworkManager` como
-gerenciador de conexão com internet para ficar me dando várias configurações. Eu apenas quero
-me conectar e pronto. Acho ele um pouco pesado em consumo de memória pra uma conexão
-muito específica.
+gerenciador de conexão com internet para ficar me dando várias configurações insignificantes.
+Eu apenas quero me conectar e pronto. Acho ele um pouco pesado em consumo de memória pra uma
+finalidade muito específica.
 
-Então, eu uso o `systemd-networkd`, e para configurar faço assim:
+Então, eu uso o `systemd-networkd` que é mais leve e objetivo.
 
 **(1)** - Caso eu já tenho o `NetworkManager` instalado, eu apenas desabilito e faço o `mask`:
 
@@ -332,7 +342,7 @@ systemctl disable --now NetworkManager.service
 systemctl mask NetworkManager.service
 ```
 
-**(2)** - Habilito o `systemd-networkd` e `systemd-resolved`:
+**(2)** - Depois habilito o `systemd-networkd` e `systemd-resolved`:
 
 ```shell
 systemctl enable --now systemd-networkd.service systemd-resolved.service
@@ -344,6 +354,7 @@ systemctl enable --now systemd-networkd.service systemd-resolved.service
 [Match]
 Name=eno1 # Nome da minha interface de rede
 
+## Conexão com IP Estático
 [Network]
 Address=192.168.0.2/24
 Gateway=192.168.0.1
@@ -353,7 +364,6 @@ DNS=8.8.8.8
 # [Network]
 # DHCP=yes
 ```
-
 
 **(4)** - Depois crio um link simbólico para o `DNS`:
 
@@ -391,7 +401,7 @@ parâmetro **-a** significa **append**, adicionar, se emitir ele, irá sobrescre
 
 ### Configurando MODULES e HOOKS do /etc/mkinitcpio.conf
 
-**(1)** - Aqui adiciono os módulos que preciso:
+**(1)** - Aqui adiciono os módulos que preciso que carreguem durante o boot:
 
 ```shell
 sed -i "s|^MODULES=.*|MODULES=(usbhid xhci_hcd ehci_hcd)|g" /etc/mkinitcpio.conf
@@ -401,11 +411,11 @@ O driver `usbhid` é esencial para reconhecer dispositivos como teclados e mouse
 via USB. Já o `xhci_hcd` e `ehci_hcd` são responsáveis por fazer a ponte entre o hardware e os
 dispositivos USB.
 
-> Nota: Como eu tenho a partição `/home` criptografada que necessita colocar a senha durante o boot,
+> Bug: Como eu tenho a partição `/home` criptografada que necessita colocar a senha durante o boot,
 eu não acrescento os módulos da minha GPU (NVIDIA) para não dar "*flicker*" na tela durante o boot
 ocasionando quebra de linha do cursor no passphrase da `/home`.
 
-**(2)** - Nos HOOKS adiciono a opção de criptografia e LVM. Antigamente eu usava o `plymouth`
+**(2)** - Nos HOOKS adiciono a opção de criptografia e **LVM**. Antigamente eu usava o `plymouth`
 depois de `keymap` para ter um boot com splash, mas hoje prefiro o boot verboso para averiguar
 alguma mensagem de erro, ou demora caso ocorra. Então faço assim:
 
@@ -423,21 +433,21 @@ pacman -S lvm2
 ### Instalando o bootloader systemd-boot
 
 Já faz um bom tempo que uso `systemd-boot` por achar o `GRUB` pesado e com recursos que nem preciso.
-Minha máquina é EFI, por que eu teria que ter um bootloader pra gerenciar Legacy também?!
+Minha máquina é **EFI**, por que eu teria que ter um bootloader pra gerenciar *Legacy* também?!
 
 Atualmente estou usando `systemd-boot` + `UKI` (Unified Kernel Image), e esses são os passos que
 faço para instalar.
 
 **(1)** - Primeiro instalo o `efibootmgr` e `intel-ucode` (O `efibootmgr` é um "gerenciador" de
-bootloader EFI, e o `intel-ucode` é um microcódigo de segurança para CPU):
+bootloader EFI, e o `intel-ucode` é um microcódigo de segurança para CPU Intel):
 
 ```shell
 pacman -S --noconfirm efibootmgr intel-ucode
 ```
 
-> Nota: Caso tenha AMD como CPU, instalar o `amd-code`.
+> Nota: Caso eu tenha AMD como CPU, instalo o `amd-code`.
 
-**(2)** - Depois faço de fato a instalação o `systemd-boot` como bootloader com o comando abaixo:
+**(2)** - Depois faço de fato a instalação o `systemd-boot` como bootloader:
 
 ```shell
 bootctl --path=/boot install
@@ -465,11 +475,11 @@ fallback_options="-S autodetect"
 ```
 
 > Nota: Caso eu queira um boot menos verboso e com splash, eu adiciono na opção `ALL_cmdline` os
-parâmentros:`quiet splash loglevel=3 systemd.show_status=auto rd.udev.log_level=3`. E depois instalo
-o pacote `plymouth`, e adiciono a flag `plymouth` nos HOOKS do `/etc/mkinitcpio.conf` depois de
-`keymap`.
+parâmentros: `quiet splash loglevel=3 systemd.show_status=auto rd.udev.log_level=3`. E depois
+instalo o pacote `plymouth`, e adiciono a flag `plymouth` nos HOOKS do `/etc/mkinitcpio.conf` depois
+de `keymap`.
 
-**(4)** - Altero o `<UUID>` pelo `UUID` da partição `/dev/mapper/linux-arch` com o comando:
+**(4)** - Altero o `<UUID>` pelo `UUID` da partição `/dev/mapper/linux-arch` com os comandos:
 
 ```shell
 ESP_DIR="/boot"
@@ -477,10 +487,10 @@ sed -i "s|<ESP_DIR>|$ESP_DIR|g" /etc/mkinitcpio.d/linux-lts.preset
 sed -i "s|<UUID>|$(blkid -s UUID -o value /dev/mapper/linux-arch)|g" /etc/mkinitcpio.d/linux-lts.preset
 ```
 
-> IMPORTANTE: Se eu usar a EFI fora do `/boot`, em `/boot/efi` futuramente, deixe assim
+> IMPORTANTE: Se eu usar a EFI fora do `/boot`, em `/boot/efi` futuramente, deixo assim
 `ESP_DIR="/boot/efi"`.
 
-**(5)** - Crio as entradas do `systemd-boot` padrão:
+**(5)** - Agora crio as entradas do `systemd-boot` padrão:
 
 ```shell
 
@@ -488,7 +498,7 @@ echo "title   Arch Linux LTS" | tee -a /boot/loader/entries/arch.conf
 echo "efi     $ESP_DIR/EFI/Linux/arch-linux-lts.efi" | tee -a /boot/loader/entries/arch.conf
 ```
 
-**(6)** - Crio as entradas do `systemd-boot` de fallback:
+**(6)** - E por final, crio as entradas do `systemd-boot` de fallback:
 
 ```shell
 echo "title   Arch Linux LTS (Fallback)" | tee -a /boot/loader/entries/arch-fallback.conf
