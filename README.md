@@ -201,6 +201,24 @@ sdb
   └─home    ext4        1.0                 65660251-8451-4722-adbd-ff5850c5df6d    999,7G    37% /home
 ```
 
+<details>
+  <summary><strong>Com partição de boot separada</strong></summary>
+
+```
+NAME        FSTYPE      FSVER     LABEL     UUID                                   FSAVAIL FSUSE% MOUNTPOINTS
+sda
+├─sda1      ext4        1.0                 69660251-8451-4322-cdbd-ff5850c5df6d      1,5G    12% /boot
+├─sda2      vfat        FAT32               BA60-4D21                                 1,5G    12% /boot
+└─sda3      LVM2_member LVM2 001            8YUXnI-FwmY-Vc8V-fUHy-cVdF-zi9X-MDAK0s
+  └──linux-arch
+           ext4        1.0                  0a73a608-5260-45c8-9bdd-8285c4a4a84b     89,8G    44% /
+sdb
+└─sdb1      crypto_LUKS 2                   a4fd06b1-a253-4661-b5a2-47ae92e68efe
+  └─home    ext4        1.0                 65660251-8451-4722-adbd-ff5850c5df6d    999,7G    37% /home
+```
+</details></br>
+
+
 ## Montagem das unidades
 
 Tudo em ordem, agora faço o `mount` das unidades:
@@ -445,6 +463,11 @@ fallback_image="${ESP_DIR}/initramfs-linux-lts-fallback.img"
 fallback_uki="${ESP_DIR}/EFI/Linux/arch-linux-lts-fallback.efi"
 fallback_options="-S autodetect"
 ```
+
+> Nota: Caso eu queira um boot menos verboso e com splash, eu adiciono na opção `ALL_cmdline` os
+parâmentros:`quiet splash loglevel=3 systemd.show_status=auto rd.udev.log_level=3`. E depois instalo
+o pacote `plymouth`, e adiciono a flag `plymouth` nos HOOKS do `/etc/mkinitcpio.conf` depois de
+`keymap`.
 
 **(4)** - Altero o `<UUID>` pelo `UUID` da partição `/dev/mapper/linux-arch` com o comando:
 
