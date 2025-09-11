@@ -390,7 +390,7 @@ que faço:
 ```conf
 ALL_config="/etc/mkinitcpio.conf"
 ALL_kver="/boot/vmlinuz-linux-lts"
-ALL_cmdline="root=UUID=0a73a608-5960-45c8-9bdd-8285c4a3a84b rw loglevel=3 nvidia_drm.modeset=1 video=1920x1080@75"
+ALL_cmdline="root=UUID=<UUID> rw loglevel=3 nvidia_drm.modeset=1 video=1920x1080@75"
 PRESETS=('default' 'fallback')
 
 default_config="/etc/mkinitcpio.conf"
@@ -404,21 +404,27 @@ fallback_uki="/boot/EFI/Linux/arch-linux-lts-fallback.efi"
 fallback_options="-S autodetect"
 ```
 
-**(2)** - Criando entradas do `systemd-boot` padrão:
+**(2)** - Altero o `<UUID>` pelo `UUID` da partição `/dev/mapper/linux-arch` com o comando:
+
+```shell
+sed -i "s|<UUID>|$(blkid -s UUID -o value /dev/mapper/linux-arch)|g" /etc/mkinitcpio.d/linux-lts.preset
+```
+
+**(3)** - Criando entradas do `systemd-boot` padrão:
 
 ```shell
 echo "title   Arch Linux LTS" | tee -a /boot/loader/entries/arch.conf
 echo "efi     /boot/EFI/Linux/arch-linux-lts.efi" | tee -a /boot/loader/entries/arch.conf
 ```
 
-**(3)** - Criando entradas do `systemd-boot` de fallback:
+**(4)** - Criando entradas do `systemd-boot` de fallback:
 
 ```shell
 echo "title   Arch Linux LTS (Fallback)" | tee -a /boot/loader/entries/arch-fallback.conf
 echo "efi     /boot/EFI/Linux/arch-linux-lts-fallback.efi" | tee -a /boot/loader/entries/arch-fallback.conf
 ```
 
-**(4)** - Gerando as imagens de EFI:
+**(5)** - Gerando as imagens de EFI:
 
 ```shell
 mkinitcpio -P
