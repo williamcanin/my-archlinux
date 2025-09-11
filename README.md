@@ -477,7 +477,8 @@ sed -i "s|<ESP_DIR>|$ESP_DIR|g" /etc/mkinitcpio.d/linux-lts.preset
 sed -i "s|<UUID>|$(blkid -s UUID -o value /dev/mapper/linux-arch)|g" /etc/mkinitcpio.d/linux-lts.preset
 ```
 
-> IMPORTANTE: Se usa a EFI fora do `/boot`, em `/boot/efi`, deixe assim `ESP_DIR="/boot/efi"`.
+> IMPORTANTE: Se eu usar a EFI fora do `/boot`, em `/boot/efi` futuramente, deixe assim
+`ESP_DIR="/boot/efi"`.
 
 **(5)** - Crio as entradas do `systemd-boot` padrão:
 
