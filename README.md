@@ -79,14 +79,14 @@ IMPORTANTES e o esboço (tabela) de como o particionamento para a instalação d
 
 ### Boot
 
-Basicamente o **Arch Linux** precisa apenas de uma partição de boot, a `/boot` do tipo **EFI System**,
+O **Arch Linux** precisa apenas de uma partição de boot, a `/boot` do tipo **EFI System**,
 MAS, caso queira fazer um dual-boot com outra distro, que necessita de duas
 partições de boot separadas, uma `/boot` do tipo **Linux filesystems** e outra `/boot/efi` do tipo
 **EFI System**, e queira COMPARTILHAR o bootloader, no caso o **systemd-boot** (que eu uso)
 entre ambas, então deve instalar o **Arch Linux** com a partição de boot separada em duas.
 
 * `Relato:`
-Eu usei duas partições de boot separadas porque queria fazer um dual-boot com o **Fedora +42**, porém,
+Uma vez usei duas partições de boot separadas porque queria fazer um dual-boot com o **Fedora +42**, porém,
 ao fazer isso, toda vez que atualizava o **Arch Linux** e gerava uma nova modificação do **vmlinuz-linux**
 e **initramfs-linux.img**, tinha que fazer uma copia de ambos para a partição **EFI**, no caso, para
 a `/boot/efi`, isso porque quando esses dois arquivos são gerados/modificados, eles "instalam" por
@@ -170,6 +170,8 @@ mkfs -t ext4 /dev/mapper/linux-arch
 mkfs -t ext4 /dev/mapper/home
 ```
 
+> IMPORTANTE! Se já tiver a partição `/dev/mapper/home`, não formatar senão perde TODOS os dados.
+
 Depois de todas unidades estarem criadas e formatadas, gosto de verificar com o comando: `lsblk -f`:
 
 ```
@@ -205,7 +207,7 @@ reflector --verbose --country Brazil,US --age 12 --protocol https --sort rate --
 pacman -Syy
 pacman -Sy archlinux-keyring
 pacman-key --populate archlinux
-pacstrap -K /mnt base base-devel linux-lts linux-lts-headers linux-firmware xclip sudo vim dhcpcd wireless_tools wpa_supplicant
+pacstrap -K /mnt base base-devel linux-lts linux-lts-headers linux-firmware sudo vim dhcpcd wireless_tools wpa_supplicant
 ```
 
 ## Gerando o /etc/fstab
@@ -305,3 +307,30 @@ DNS=8.8.8.8
 ```shell
 ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 ```
+
+### Configurando /home criptografado
+
+O arquivo de configuração para dispositivos criptografados lançados durante o boot no **Arch Linux**,
+é o `/etc/crypttab.initramfs`. Por padrão ele não existe, então eu crio o mesmo atribuindo o `UUID` do
+dispositivo criptografado LUKS, que no caso é o `/dev/sdb1` com os comandos:
+
+**(1)** - Agora crio o arquivo `/etc/crypttab.initramfs` com o comando:
+
+```shell
+echo "\n\n#/dev/sdb1" | tee /etc/fstab
+echo "home UUID=$(blkid -s UUID -o value /dev/sdb1) none luks,tries=0,timeout=0" | tee -a /etc/crypttab.initramfs
+```
+
+> ATENÇÃO!!! Não confundir `/dev/sdb1` (LUKS) com `/dev/mapper/home` (partição).
+
+**(2)** - Agora precisa colocar o `/dev/mapper/home` para iniciar com o sistema no arquivo
+`/etc/fstab`. Primeiro sigo o mesmo passo de cima, copiando o `UUID` mas dessa vez do `/etc/fstab`:
+
+```shell
+echo "\n\n#/dev/mapper/home" | tee -a /etc/fstab
+echo "UUID=$(blkid -s UUID -o value /dev/mapper/home) /home ext4 rw,relatime,data=ordered 0 2" | tee -a /etc/fstab
+```
+
+> ATENÇÃO!!! Observe que para inserir a configuração no `/etc/fstab`, estou usando **tee -a**, este
+parâmetro **-a** significa **append**, adicionar, se emitir ele, irá sobrescrever o `/etc/fstab`.
+
