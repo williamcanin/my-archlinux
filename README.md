@@ -118,7 +118,8 @@ com o sistema de arquivos `ext4`.
 | /dev/sda2   | 120G    | Linux LVM           |         |
 | /dev/sdb1   | 1T      | Linux filesystems   | /home   |
 
-**Com a partição de boot EFI SEPARADA:**
+<details>
+  <summary>Com a partição de boot EFI SEPARADA</summary>
 
 | Dispositivo | Tamanho |    Tipo             |  Local    |
 |-------------|---------|---------------------|-----------|
@@ -126,6 +127,8 @@ com o sistema de arquivos `ext4`.
 | /dev/sda2   | 2G      | Sistema EFI         | /boot/efi |
 | /dev/sda3   | 120G    | Linux LVM           |           |
 | /dev/sdb1   | 1T      | Linux filesystems   | /home     |
+
+</details>
 
 Para o particionamento, geralmente eu uso o `cfdisk`, assim:
 
