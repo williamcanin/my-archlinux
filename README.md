@@ -394,7 +394,7 @@ pacman -S --noconfirm efibootmgr intel-ucode
 
 > Nota: Caso tenha AMD como CPU, instalar o `amd-code`.
 
-**(2)** - Instalar o `systemd-boot` como bootloader:
+**(2)** - Depois faço de fato a instalação o `systemd-boot` como bootloader com o comando abaixo:
 
 ```shell
 bootctl --path=/boot install
@@ -425,21 +425,21 @@ fallback_options="-S autodetect"
 sed -i "s|<UUID>|$(blkid -s UUID -o value /dev/mapper/linux-arch)|g" /etc/mkinitcpio.d/linux-lts.preset
 ```
 
-**(5)** - Criando entradas do `systemd-boot` padrão:
+**(5)** - Crio as entradas do `systemd-boot` padrão:
 
 ```shell
 echo "title   Arch Linux LTS" | tee -a /boot/loader/entries/arch.conf
 echo "efi     /boot/EFI/Linux/arch-linux-lts.efi" | tee -a /boot/loader/entries/arch.conf
 ```
 
-**(6)** - Criando entradas do `systemd-boot` de fallback:
+**(6)** - Crio as entradas do `systemd-boot` de fallback:
 
 ```shell
 echo "title   Arch Linux LTS (Fallback)" | tee -a /boot/loader/entries/arch-fallback.conf
 echo "efi     /boot/EFI/Linux/arch-linux-lts-fallback.efi" | tee -a /boot/loader/entries/arch-fallback.conf
 ```
 
-**(7)** - Gerando as imagens de EFI:
+**(7)** - Gero as imagens de `.efi`:
 
 ```shell
 mkinitcpio -P
