@@ -382,10 +382,25 @@ pacman -S lvm2
 Já faz um bom tempo que uso `systemd-boot` por achar o `GRUB` pesado e com recursos que nem preciso.
 Minha máquina é EFI, por que eu teria que ter um bootloader pra gerenciar Legacy também?!
 
-Atualmente estou usando `systemd-boot` + `UKI` (Unified Kernel Image), e essas são as configurações
-que faço:
+Atualmente estou usando `systemd-boot` + `UKI` (Unified Kernel Image), e esses são os passos que
+faço para instalar.
 
-**(1)** - Abro o `/etc/mkinitcpio.d/linux-lts.preset` com `vim` e adiciono a configuração abaixo:
+**(1)** - Primeiro instalo o `efibootmgr` e `intel-ucode` (O `efibootmgr` é um "gerenciador" de bootloader
+EFI, e o `intel-ucode` é um microcódigo de segurança para CPU):
+
+```shell
+pacman -S --noconfirm efibootmgr intel-ucode
+```
+
+> Nota: Caso tenha AMD como CPU, instalar o `amd-code`.
+
+**(2)** - Instalar o `systemd-boot` como bootloader:
+
+```shell
+bootctl --path=/boot install
+```
+
+**(3)** - Abro o `/etc/mkinitcpio.d/linux-lts.preset` com `vim` e adiciono a configuração abaixo:
 
 ```conf
 ALL_config="/etc/mkinitcpio.conf"
@@ -404,27 +419,27 @@ fallback_uki="/boot/EFI/Linux/arch-linux-lts-fallback.efi"
 fallback_options="-S autodetect"
 ```
 
-**(2)** - Altero o `<UUID>` pelo `UUID` da partição `/dev/mapper/linux-arch` com o comando:
+**(4)** - Altero o `<UUID>` pelo `UUID` da partição `/dev/mapper/linux-arch` com o comando:
 
 ```shell
 sed -i "s|<UUID>|$(blkid -s UUID -o value /dev/mapper/linux-arch)|g" /etc/mkinitcpio.d/linux-lts.preset
 ```
 
-**(3)** - Criando entradas do `systemd-boot` padrão:
+**(5)** - Criando entradas do `systemd-boot` padrão:
 
 ```shell
 echo "title   Arch Linux LTS" | tee -a /boot/loader/entries/arch.conf
 echo "efi     /boot/EFI/Linux/arch-linux-lts.efi" | tee -a /boot/loader/entries/arch.conf
 ```
 
-**(4)** - Criando entradas do `systemd-boot` de fallback:
+**(6)** - Criando entradas do `systemd-boot` de fallback:
 
 ```shell
 echo "title   Arch Linux LTS (Fallback)" | tee -a /boot/loader/entries/arch-fallback.conf
 echo "efi     /boot/EFI/Linux/arch-linux-lts-fallback.efi" | tee -a /boot/loader/entries/arch-fallback.conf
 ```
 
-**(5)** - Gerando as imagens de EFI:
+**(7)** - Gerando as imagens de EFI:
 
 ```shell
 mkinitcpio -P
