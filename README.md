@@ -329,7 +329,7 @@ dispositivo criptografado LUKS, que no caso é o `/dev/sdb1`.
 **(1)** - Crio o arquivo `/etc/crypttab.initramfs` inserindo o `UUID` com a ajuda do `blkid`:
 
 ```shell
-echo "\n\n #/dev/sdb1" | tee /etc/crypttab.initramfs
+echo "\n\n #/dev/sdb1" | tee -a /etc/crypttab.initramfs
 echo "home UUID=$(blkid -s UUID -o value /dev/sdb1) none luks,tries=0,timeout=0" | tee -a /etc/crypttab.initramfs
 ```
 
@@ -381,3 +381,45 @@ pacman -S lvm2
 
 Já faz um bom tempo que uso `systemd-boot` por achar o `GRUB` e pesado e com recursos que nem preciso.
 Minha máquina é EFI, por que eu teria que ter um bootloader pra Legacy também?!
+
+Atualmente estou usando `systemd-boot` + `UKI` (Unified Kernel Image), e essas são as configurações
+que faço:
+
+**(1)** - Abro o `/etc/mkinitcpio.d/linux-lts.preset` com `vim` e adiciono a configuração abaixo:
+
+```conf
+ALL_config="/etc/mkinitcpio.conf"
+ALL_kver="/boot/vmlinuz-linux-lts"
+ALL_cmdline="root=UUID=0a73a608-5960-45c8-9bdd-8285c4a3a84b rw loglevel=3 nvidia_drm.modeset=1 video=1920x1080@75"
+PRESETS=('default' 'fallback')
+
+default_config="/etc/mkinitcpio.conf"
+default_image="/boot/initramfs-linux-lts.img"
+default_uki="/boot/EFI/Linux/arch-linux-lts.efi"
+default_options="--splash /usr/share/systemd/bootctl/splash-arch.bmp"
+
+fallback_config="/etc/mkinitcpio.conf"
+fallback_image="/boot/initramfs-linux-lts-fallback.img"
+fallback_uki="/boot/EFI/Linux/arch-linux-lts-fallback.efi"
+fallback_options="-S autodetect"
+```
+
+**(2)** - Criando entradas do `systemd-boot` padrão:
+
+```shell
+echo "title   Arch Linux LTS" | tee -a /boot/loader/entries/arch.conf
+echo "efi     /boot/EFI/Linux/arch-linux-lts.efi" | tee -a /boot/loader/entries/arch.conf
+```
+
+**(3)** - Criando entradas do `systemd-boot` de fallback:
+
+```shell
+echo "title   Arch Linux LTS (Fallback)" | tee -a /boot/loader/entries/arch-fallback.conf
+echo "efi     /boot/EFI/Linux/arch-linux-lts-fallback.efi" | tee -a /boot/loader/entries/arch-fallback.conf
+```
+
+**(4)** - Gerando as imagens de EFI:
+
+```shell
+mkinitcpio -P
+```
