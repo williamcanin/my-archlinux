@@ -379,8 +379,8 @@ pacman -S lvm2
 
 ### Instalando o bootloader systemd-boot
 
-Já faz um bom tempo que uso `systemd-boot` por achar o `GRUB` e pesado e com recursos que nem preciso.
-Minha máquina é EFI, por que eu teria que ter um bootloader pra Legacy também?!
+Já faz um bom tempo que uso `systemd-boot` por achar o `GRUB` pesado e com recursos que nem preciso.
+Minha máquina é EFI, por que eu teria que ter um bootloader pra gerenciar Legacy também?!
 
 Atualmente estou usando `systemd-boot` + `UKI` (Unified Kernel Image), e essas são as configurações
 que faço:
