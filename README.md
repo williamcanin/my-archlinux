@@ -88,7 +88,7 @@ em minha máquina.
 | /dev/sdb1   | 1T      | Linux filesystems   | /home   |
 
 <details>
-  <summary style="color: #fcfa7aff"><strong>>>> Informações</strong></summary>
+  <summary><strong>>>> Informações</strong></summary>
 
 ### Boot
 
@@ -130,7 +130,7 @@ com o sistema de arquivos `ext4`.
 | /dev/sda3   | 120G    | Linux LVM           |           |
 | /dev/sdb1   | 1T      | Linux filesystems   | /home     |
 
-</details>
+</details></br></br>
 
 Para realizar o particionamento, geralmente eu uso o `cfdisk`:
 
