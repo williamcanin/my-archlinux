@@ -210,7 +210,7 @@ reflector --verbose --country Brazil,US --age 12 --protocol https --sort rate --
 pacman -Syy
 pacman -Sy archlinux-keyring
 pacman-key --populate archlinux
-pacstrap -K /mnt base base-devel linux-lts linux-lts-headers linux-firmware sudo vim dhcpcd wireless_tools wpa_supplicant
+pacstrap -K /mnt base base-devel linux-lts linux-lts-headers linux-firmware systemd systemd-ukify sudo vim dhcpcd wireless_tools wpa_supplicant
 ```
 
 ## Gerando o /etc/fstab
@@ -376,3 +376,8 @@ sed -i "s|^HOOKS=.*|HOOKS=(base systemd autodetect keymap modconf kms keyboard s
 ```shell
 pacman -S lvm2
 ```
+
+### Instalando o bootloader systemd-boot
+
+Já faz um bom tempo que uso `systemd-boot` por achar o `GRUB` e pesado e com recursos que nem preciso.
+Minha máquina é EFI, por que eu teria que ter um bootloader pra Legacy também?!
