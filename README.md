@@ -346,5 +346,33 @@ echo "UUID=$(blkid -s UUID -o value /dev/mapper/home) /home ext4 rw,relatime,dat
 > ATENÇÃO!!! Observe que para inserir a configuração no `/etc/fstab`, estou usando **tee -a**, este
 parâmetro **-a** significa **append**, adicionar, se emitir ele, irá sobrescrever o `/etc/fstab`.
 
-### Configurando HOOKS do /etc/mkinitcpio.conf
+### Configurando MODULES e HOOKS do /etc/mkinitcpio.conf
 
+**(1)** - Aqui adiciono os módulos que preciso:
+
+```shell
+sed -i "s|^MODULES=.*|MODULES=(usbhid xhci_hcd ehci_hcd)|g" /etc/mkinitcpio.conf
+```
+
+O driver `usbhid` é esencial para reconhecer dispositivos como teclados e mouses que se conectam
+via USB. Já o `xhci_hcd` e `ehci_hcd` são responsáveis por fazer a ponte entre o hardware e os
+dispositivos USB.
+
+> Nota: Como eu tenho a partição `/home` criptografada que necessita colocar a senha durante o boot,
+eu não acrescento os módulos da minha GPU (NVIDIA) para não dar "*flicker*" na tela durante o boot
+ocasionando quebra de linha do cursor no passphrase da `/home`.
+
+**(2)** - Nos HOOKS adiciono a opção de criptografia e LVM. Antigamente eu usava o `plymouth`
+depois de `keymap` para ter um boot com splash, mas hoje prefiro o boot verboso para averiguar
+alguma mensagem de erro, ou demora caso ocorra. Então faço assim:
+
+
+```shell
+sed -i "s|^HOOKS=.*|HOOKS=(base systemd autodetect keymap modconf kms keyboard sd-vconsole block sd-encrypt lvm2 filesystems fsck)|g" /etc/mkinitcpio.conf
+```
+
+**(3)** - Agora instalo o pacote `lvm2`:
+
+```shell
+pacman -S lvm2
+```
