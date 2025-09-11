@@ -88,7 +88,7 @@ em minha máquina.
 | /dev/sdb1   | 1T      | Linux filesystems   | /home   |
 
 <details>
-  <summary><strong>>> Informações</strong></summary>
+  <summary style="color: #fcfa7aff"><strong>>>> Informações</strong></summary>
 
 ### Boot
 
