@@ -121,7 +121,9 @@ que isso para o sistema. Atualmente estou usando o sistema de arquivo `ext4`.
 Tenho um HDD de 1 Terabyte (1Tb) para minha `/home`, e criptografo a mesma usando o LUKS (dm_crypt),
 com o sistema de arquivos `ext4`.
 
-**Tabela com a partição de boot separada em duas:**
+### Tabela
+
+Tabela com a partição de boot separada em duas:
 
 | Dispositivo | Tamanho |    Tipo             |  Local    |
 |-------------|---------|---------------------|-----------|
