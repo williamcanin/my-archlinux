@@ -96,20 +96,17 @@ O **Arch Linux** precisa apenas de uma partição de boot, a `/boot` do tipo **E
 MAS, caso queira fazer um dual-boot com outra distro, que necessita de duas
 partições de boot separadas, uma `/boot` do tipo **Linux filesystems** e outra `/boot/efi` do tipo
 **EFI System**, e queira COMPARTILHAR o bootloader, no caso o **systemd-boot** (que eu uso)
-entre ambas, então deve instalar o **Arch Linux** com a partição de boot separada em duas.
+entre ambas, então deve instalar o **Arch Linux** com a partição de boot separada em duas também.
 
-* `Relato:`
-Uma vez usei duas partições de boot separadas porque queria fazer um dual-boot com o **Fedora +42**, porém,
-ao fazer isso, toda vez que atualizava o **Arch Linux** e gerava uma nova modificação do **vmlinuz-linux**
-e **initramfs-linux.img**, tinha que fazer uma copia de ambos para a partição **EFI**, no caso, para
-a `/boot/efi`, isso porque quando esses dois arquivos são gerados/modificados, eles "instalam" por
-padrão em `/boot`, e o **systemd-boot** não consegue reconhecer "nada" fora do `/boot/efi`, por isso
-é NECESSÁRIO a copia.
-* Para fazer essa copia automatizada, eu tive que criar [este hooks](https://github.com/williamcanin/my-archlinux/blob/main/hooks/90-systemd-boot) em `/etc/initcpio/post/90-systemd-boot`.
-Geralmente essa configuração é realizada no pos instalação do **Arch Linux**, mas vou deixar relatado aqui mesmo.
+Toda vez que o **Arch Linux** gera o **vmlinuz-linux-lts** e **initramfs-linux-lts.img**, ele gera
+no diretorio `/boot`, isso porque a configuração padrão é para esté diretório, mas com a EFI
+apontando para `/boot/efi`, tive que modificar essa configuração no arquivo
+`/etc/mkinitcpio.d/linux-lts.preset` e reinstalar o kernel. Na seção de
+**Instalando o bootloader systemd-boot** você irá ver informações sobre essa modificação.
+
 * Sabendo disso, nesses guias NÃO VOU USAR duas partição de boot porque não uso mais dual-boot e
-nem compartilhamento do **systemd-boot** com outros sistemas, porém, eu vou deixar as duas tabelas
-de como fica ambos os casos, a de uma partição de boot, e a de duas partições de boot.
+nem compartilhamento do **systemd-boot** com outros sistemas, porém, eu vou relatado cada passo que
+precisa fazer caso seja uma instalação com `/boot` e `/boot/efi`.
 
 ### Sistema
 
@@ -123,7 +120,7 @@ com o sistema de arquivos `ext4`.
 
 ### Tabela
 
-Tabela com a partição de boot separada em duas:
+Tabela com a partição de boot separada em duas deve ficar assim:
 
 | Dispositivo | Tamanho |    Tipo             |  Local    |
 |-------------|---------|---------------------|-----------|
@@ -268,11 +265,11 @@ passwd
 Aqui habilito o repositório `[multilib]` e ignoro alguns pacotes de serem instalados e atualizados.
 
 > NOTA: Como eu uso kernel *LTS*, não tenho mania de ficar atualizando kernel sempre, e também
-não uso os driver da minha GPU (**NVIDIA**) diretamente do repo do **Arch Linux**. Como o **Arch Linux** é
-rolling-release e sempre disponibiliza a "última" versão dos pacotes, tive alguns problemas com
-a útilma versão da **NVIDIA** em relação a minha GPU, então instalo o driver (`.run`) baixado do próprio
-[site da NVIDIA](https://www.nvidia.com/en-us/drivers/unix/) com uma versão anterior, mas especificamente
-a *Latest New Feature Branch Version*.
+não uso os driver da minha GPU (**NVIDIA**) diretamente do repo do **Arch Linux**. Como o
+**Arch Linux** é rolling-release e sempre disponibiliza a "última" versão dos pacotes, tive alguns
+problemas com a útilma versão da **NVIDIA** em relação a minha GPU, então instalo o driver (`.run`)
+baixado do próprio [site da NVIDIA](https://www.nvidia.com/en-us/drivers/unix/) com uma versão
+anterior, mas especificamente a *Latest New Feature Branch Version*.
 
 **(1)** - Abro o **/etc/pacman.conf**:
 
@@ -348,9 +345,9 @@ ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 
 ### Configurando /home criptografado
 
-O arquivo de configuração para dispositivos criptografados lançados "durante o boot" no **Arch Linux**,
-é o `/etc/crypttab.initramfs`. Por padrão ele não existe, então eu crio o mesmo atribuindo o `UUID` do
-dispositivo criptografado LUKS, que no caso é o `/dev/sdb1`.
+O arquivo de configuração para dispositivos criptografados lançados "durante o boot" no
+**Arch Linux**, é o `/etc/crypttab.initramfs`. Por padrão ele não existe, então eu crio o mesmo
+atribuindo o `UUID` do dispositivo criptografado LUKS, que no caso é o `/dev/sdb1`.
 
 **(1)** - Crio o arquivo `/etc/crypttab.initramfs` inserindo o `UUID` com a ajuda do `blkid`:
 
@@ -359,10 +356,12 @@ echo "\n\n #/dev/sdb1" | tee -a /etc/crypttab.initramfs
 echo "home UUID=$(blkid -s UUID -o value /dev/sdb1) none luks,tries=0,timeout=0" | tee -a /etc/crypttab.initramfs
 ```
 
-> ATENÇÃO!!! Não confundir `/dev/sdb1` (dispositivo LUKS) com `/dev/mapper/home` (partição com sistema de arquivos).
+> ATENÇÃO!!! Não confundir `/dev/sdb1` (dispositivo LUKS) com `/dev/mapper/home`
+(partição com sistema de arquivos).
 
 **(2)** - Agora para a partição `/dev/mapper/home` iniciar com o sistema, insiro a mesma no arquivo
-`/etc/fstab`. Sigo basicamente a mesma ideia do comando de acima, copiando o `UUID` com o `blkid` mas dessa vez no `/etc/fstab`:
+`/etc/fstab`. Sigo basicamente a mesma ideia do comando de acima, copiando o `UUID` com o `blkid`
+mas dessa vez no `/etc/fstab`:
 
 ```shell
 echo "\n\n #/dev/mapper/home" | tee -a /etc/fstab
@@ -411,8 +410,8 @@ Minha máquina é EFI, por que eu teria que ter um bootloader pra gerenciar Lega
 Atualmente estou usando `systemd-boot` + `UKI` (Unified Kernel Image), e esses são os passos que
 faço para instalar.
 
-**(1)** - Primeiro instalo o `efibootmgr` e `intel-ucode` (O `efibootmgr` é um "gerenciador" de bootloader
-EFI, e o `intel-ucode` é um microcódigo de segurança para CPU):
+**(1)** - Primeiro instalo o `efibootmgr` e `intel-ucode` (O `efibootmgr` é um "gerenciador" de
+bootloader EFI, e o `intel-ucode` é um microcódigo de segurança para CPU):
 
 ```shell
 pacman -S --noconfirm efibootmgr intel-ucode
