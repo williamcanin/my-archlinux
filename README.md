@@ -460,8 +460,8 @@ bootctl --path=/boot install
 **(3)** - Crio o loader do `systemd-boot`:
 
 ```shell
-ESP_DIR="/boot";
-cat << EOF > $ESP_DIR/loader/loader.conf
+ESP_DIR_TEMP="/boot";
+cat << EOF > $ESP_DIR_TEMP/loader/loader.conf
 default arch.conf
 timeout 3
 console-mode max
@@ -469,8 +469,7 @@ editor no
 EOF
 ```
 
-> IMPORTANTE: Se eu usar a EFI fora do `/boot`, em `/boot/efi` futuramente, deixo assim
-`ESP_DIR="/boot/efi"`.
+> Nota: Está variável de ambiente `ESP_DIR_TEMP` é temporária, é apenas para o momento de instalação.
 
 **(4)** - Crio um backup do "preset" primeiro:
 
@@ -482,7 +481,7 @@ cp /etc/mkinitcpio.d/linux-lts.preset /etc/mkinitcpio.d/linux-lts.preset.backup
 
 ```shell
 cat << EOF > /etc/mkinitcpio.d/linux-lts.preset
-ESP_DIR="${ESP_DIR}"
+ESP_DIR="${ESP_DIR_TEMP}"
 
 ALL_config="/etc/mkinitcpio.conf"
 ALL_kver="\${ESP_DIR}/vmlinuz-linux-lts"
@@ -501,6 +500,9 @@ fallback_options="-S autodetect"
 EOF
 ```
 
+> **IMPORTANTE:** Se eu usar a EFI fora do `/boot`, em `/boot/efi` futuramente, deixo assim
+`ESP_DIR="/boot/efi"`.
+
 > Dica: Caso eu queira um boot menos verboso e com splash, eu adiciono na opção `ALL_cmdline` os
 parâmentros: `quiet splash loglevel=3 systemd.show_status=auto rd.udev.log_level=3`. E depois
 instalo o pacote `plymouth`, e adiciono a flag `plymouth` nos HOOKS do `/etc/mkinitcpio.conf` depois
@@ -511,7 +513,7 @@ de `keymap`.
 ```shell
 cat << EOF > /boot/loader/entries/arch.conf
 title   Arch Linux LTS
-efi     $ESP_DIR/EFI/Linux/arch-linux-lts.efi
+efi     $ESP_DIR_TEMP/EFI/Linux/arch-linux-lts.efi
 EOF
 ```
 
@@ -520,7 +522,7 @@ EOF
 ```shell
 cat << EOF > /boot/loader/entries/arch-fallback.conf
 title   Arch Linux LTS (Fallback)
-efi     $ESP_DIR/EFI/Linux/arch-linux-lts-fallback.efi
+efi     $ESP_DIR_TEMP/EFI/Linux/arch-linux-lts-fallback.efi
 EOF
 ```
 
