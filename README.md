@@ -516,3 +516,85 @@ echo "efi     $ESP_DIR/EFI/Linux/arch-linux-lts-fallback.efi" | tee -a /boot/loa
 ```shell
 pacman -S --noconfirm linux-lts
 ```
+
+### Instalação de drivers gráficos
+
+**OpenGL/Vulkan**
+
+```shell
+pacman -S --noconfirm xorg wayland dialog mesa lib32-mesa xf86-video-vesa vulkan-icd-loader
+lib32-vulkan-icd-loader vulkan-tools
+```
+
+**Intel**
+
+```shell
+pacman -S --noconfirm mesa-vulkan-intel vulkan-intel linux-firmware-intel
+```
+
+<details>
+  <summary><strong>AMD</strong></summary>
+
+```shell
+pacman -S --noconfirm mesa-vulkan-radeon vulkan-radeon linux-firmware-radeon
+```
+</details></br>
+
+**NVIDIA (Nouveau)**
+
+```shell
+pacman -S --noconfirm  xf86-video-nouveau vulkan-nouveau
+```
+
+<details>
+  <summary><strong>NVIDIA (proprietary)</strong></summary>
+
+Como já relatei acima, não uso o driver proprietário da NVIDIA do repo do **Arch Linux** por
+algumas incompatibilidades que tive na última versão.
+
+```shell
+pacman -S --noconfirm nvidia nvidia-utils lib32-nvidia-utils nvidia-settings opencl-nvidia
+systemctl set-default multi-user.target
+```
+</details></br>
+
+### Instalação de drivers e aplicações de áudio
+
+```shell
+pacman -S --noconfirm pipewire pipewire-audio pipewire-pulse pipewire-alsa pipewire-jack
+easyeffects lsp-plugins-lv2 mda.lv2 zam-plugins-lv2 zam-plugins-lv2 calf
+```
+
+### Instalação do ambiente de trabalho (XFCE)
+
+```shell
+pacman -S --noconfirm xfce4 xfce4-goodies appmenu-gtk-module libdbusmenu-glib lightdm
+lightdm-gtk-greeter
+```
+
+<details>
+  <summary><strong>Instalação do ambiente de trabalho (GNOME)</strong></summary>
+
+**Mínimo:**
+
+```shell
+pacman -S --noconfirm gnome-shell gnome-control-center gnome-terminal nautilus gnome-browser-connector gnome-shell-extensions gnome-tweaks gdm
+```
+
+**Completo:**
+
+```shell
+pacman -S --noconfirm gnome gnome-extra gnome-desktop gnome-shell-extensions gnome-browser-connector
+gnome-tweaks gdm
+```
+</details></br>
+
+### Instalação de aplicações básicas que uso
+
+```shell
+pacman -S --needed --noconfirm pacman-contrib dkms xdg-user-dirs ntfs-3g udisks2 dosfstools mtools
+cpupower reflector samba git openssh tor virtualbox-guest-utils vlc transmission-gtk gvfs gvfs-smb
+ttf-dejavu ttf-dejavu-nerd terminator zip unzip xarchiver leafpad gimp inkscape pavucontrol make
+gcc go ruby perl tk python nodejs npm arch-wiki-docs arch-wiki-lite zeal qemu-full virt-manager
+piper firefox libreoffice-fresh libreoffice-fresh-pt-BR libreoffice-fresh-en_US
+```
