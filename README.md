@@ -90,7 +90,7 @@ em minha máquina.
 | /dev/sdb1   | 1T      | Linux filesystems   | /home   |
 
 <details>
-  <summary><strong>>>> Informações 🤔</strong></summary>
+  <summary><strong>>>> Informações interessantes 🤔</strong></summary>
 
 ## Boot
 
@@ -189,7 +189,7 @@ mkfs -t ext4 /dev/mapper/home;
 ```
 </details></br>
 
-> IMPORTANTE! Se já tiver a partição `/dev/mapper/home`, não formatar senão perde TODOS os dados.
+> IMPORTANTE! Se já tiver a partição `/dev/mapper/home` com arquivos, não formatar senão perde TODOS os arquivos.
 
 Depois de todas unidades estarem criadas e formatadas, gosto de verificar com o comando: `lsblk -f`:
 
@@ -282,52 +282,6 @@ A primeira coisa que gosto de fazer é atribuir uma senha para o usuário `root`
 passwd
 ```
 
-# Configurando o Pacman
-
-Aqui habilito o repositório `[multilib]` e ignoro alguns pacotes de serem instalados e atualizados.
-
-> NOTA: Como eu uso kernel *LTS*, não tenho mania de ficar atualizando kernel sempre, e também
-não uso os driver da minha GPU (**NVIDIA**) diretamente do repo do **Arch Linux**. Como o
-**Arch Linux** é rolling-release e sempre disponibiliza a "última" versão dos pacotes, tive alguns
-problemas com a útilma versão da **NVIDIA** em relação a minha GPU 😠, então instalo o driver (`.run`)
-baixado do próprio [site da NVIDIA](https://www.nvidia.com/en-us/drivers/unix/) com uma versão
-anterior, mas especificamente a *Latest New Feature Branch Version*.
-
-**(1)** - Abro o **/etc/pacman.conf**:
-
-```shell
-vim /etc/pacman.conf
-```
-
-**(2)** - Descomento as seguintes linhas do `[multilib]` deixando assim:
-
-```conf
-[multilib]
-Include = /etc/pacman.d/mirrorlist
-```
-
-**(3)** - Ignoro atualização/instalação de alguns pacotes do repo do **Arch Linux** que não uso,
-adicionando o seguintes:
-
-```conf
-IgnorePkg  = linux-lts linux linux-zen linux-headers linux-zen-headers linux-lts-headers
-nvidia-utils nvidia-settings nvidia lib32-nvidia cuda
-```
-
-**(4)** - Adiciono meu próprio repo de algumas configurações que fiz para minha máquina 😎:
-
-```conf
-[canin]
-SigLevel = Optional TrustAll
-Server = https://williamcanin.gitlab.io/archlinux/stable/x86_64
-```
-
-**(5)** - Atualizo o cache do pacman:
-
-```shell
-pacman -Syy
-```
-
 # Configurando internet
 
 Como atualmente uso uma conexão via cabo, não tenho necessidade de usar o `NetworkManager` como
@@ -372,6 +326,52 @@ DNS=8.8.8.8
 
 ```shell
 ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
+```
+
+# Configurando o Pacman
+
+Aqui habilito o repositório `[multilib]` e ignoro alguns pacotes de serem instalados e atualizados.
+
+> NOTA: Como eu uso kernel *LTS*, não tenho mania de ficar atualizando kernel sempre, e também
+não uso os driver da minha GPU (**NVIDIA**) diretamente do repo do **Arch Linux**. Como o
+**Arch Linux** é rolling-release e sempre disponibiliza a "última" versão dos pacotes, tive alguns
+problemas com a útilma versão da **NVIDIA** em relação a minha GPU 😠, então instalo o driver (`.run`)
+baixado do próprio [site da NVIDIA](https://www.nvidia.com/en-us/drivers/unix/) com uma versão
+anterior, mas especificamente a *Latest New Feature Branch Version*.
+
+**(1)** - Abro o **/etc/pacman.conf**:
+
+```shell
+vim /etc/pacman.conf
+```
+
+**(2)** - Descomento as seguintes linhas do `[multilib]` deixando assim:
+
+```conf
+[multilib]
+Include = /etc/pacman.d/mirrorlist
+```
+
+**(3)** - Ignoro atualização/instalação de alguns pacotes do repo do **Arch Linux** que não uso,
+adicionando o seguintes:
+
+```conf
+IgnorePkg  = linux-lts linux linux-zen linux-headers linux-zen-headers linux-lts-headers
+nvidia-utils nvidia-settings nvidia lib32-nvidia cuda
+```
+
+**(4)** - Adiciono meu próprio repo de algumas configurações que fiz para minha máquina 😎:
+
+```conf
+[canin]
+SigLevel = Optional TrustAll
+Server = https://williamcanin.gitlab.io/archlinux/stable/x86_64
+```
+
+**(5)** - Atualizo o cache do pacman:
+
+```shell
+pacman -Syy
 ```
 
 # Configurando /home
