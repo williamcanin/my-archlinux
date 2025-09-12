@@ -513,8 +513,8 @@ default_uki="/boot/\${ESP_DIR}EFI/Linux/arch-linux-lts.efi"
 default_options="--splash /usr/share/systemd/bootctl/splash-arch.bmp"
 
 fallback_config="/etc/mkinitcpio.conf"
-fallback_image="/boot/\${ESP_DIR}/initramfs-linux-lts-fallback.img"
-fallback_uki="/boot/\${ESP_DIR}/EFI/Linux/arch-linux-lts-fallback.efi"
+fallback_image="/boot/\${ESP_DIR}initramfs-linux-lts-fallback.img"
+fallback_uki="/boot/\${ESP_DIR}EFI/Linux/arch-linux-lts-fallback.efi"
 fallback_options="-S autodetect"
 EOF
 ```
