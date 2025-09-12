@@ -90,7 +90,7 @@ em minha máquina.
 | /dev/sdb1   | 1T      | Linux filesystems   | /home   |
 
 <details>
-  <summary><strong>>>> Informações</strong></summary>
+  <summary><strong>>>> Informações 🤔</strong></summary>
 
 ### Boot
 
@@ -289,7 +289,7 @@ Aqui habilito o repositório `[multilib]` e ignoro alguns pacotes de serem insta
 > NOTA: Como eu uso kernel *LTS*, não tenho mania de ficar atualizando kernel sempre, e também
 não uso os driver da minha GPU (**NVIDIA**) diretamente do repo do **Arch Linux**. Como o
 **Arch Linux** é rolling-release e sempre disponibiliza a "última" versão dos pacotes, tive alguns
-problemas com a útilma versão da **NVIDIA** em relação a minha GPU, então instalo o driver (`.run`)
+problemas com a útilma versão da **NVIDIA** em relação a minha GPU 😠, então instalo o driver (`.run`)
 baixado do próprio [site da NVIDIA](https://www.nvidia.com/en-us/drivers/unix/) com uma versão
 anterior, mas especificamente a *Latest New Feature Branch Version*.
 
@@ -314,7 +314,7 @@ IgnorePkg  = linux-lts linux linux-zen linux-headers linux-zen-headers linux-lts
 nvidia-utils nvidia-settings nvidia lib32-nvidia cuda
 ```
 
-**(4)** - Adiciono meu próprio repo de algumas configurações que fiz para minha máquina:
+**(4)** - Adiciono meu próprio repo de algumas configurações que fiz para minha máquina 😎:
 
 ```conf
 [canin]
@@ -332,6 +332,7 @@ pacman -Syy
 
 Como atualmente uso uma conexão via cabo, não tenho necessidade de usar o `NetworkManager` como
 gerenciador de conexão com internet para ficar me dando várias configurações insignificantes.
+
 Eu apenas quero me conectar e pronto. Acho ele um pouco pesado em consumo de memória pra uma
 finalidade muito específica.
 
@@ -439,9 +440,10 @@ pacman -S lvm2
 ### Instalando o bootloader systemd-boot
 
 Já faz um bom tempo que uso `systemd-boot` por achar o `GRUB` pesado e com recursos que nem preciso.
-Minha máquina é **EFI**, por que eu teria que ter um bootloader pra gerenciar *Legacy* também?!
 
-Atualmente estou usando `systemd-boot` + `UKI` (Unified Kernel Image), e esses são os passos que
+Minha máquina é **EFI**, por que eu teria que ter um bootloader pra gerenciar *Legacy* também?! 🤔
+
+Atualmente estou usando `systemd-boot` + `UKI` (Unified Kernel Image) ❤️, e esses são os passos que
 faço para instalar.
 
 **(1)** - Primeiro instalo o `efibootmgr` e `intel-ucode` (O `efibootmgr` é um "gerenciador" de
@@ -564,10 +566,10 @@ pacman -S --noconfirm  xf86-video-nouveau vulkan-nouveau
 ```
 
 <details>
-  <summary><strong>NVIDIA (proprietary)</strong></summary>
+  <summary><strong>NVIDIA (proprietary) 🙄</strong></summary>
 
 Como já relatei acima, não uso o driver proprietário da NVIDIA do repo do **Arch Linux** por
-algumas incompatibilidades que tive na última versão, mas mesmo assim vou deixar os paacotes
+algumas incompatibilidades que tive na última versão 😡, mas mesmo assim vou deixar os pacotes
 essenciais que se deve instalar:
 
 ```shell
@@ -583,7 +585,7 @@ pacman -S --needed --noconfirm pipewire pipewire-audio pipewire-pulse pipewire-a
 easyeffects lsp-plugins-lv2 mda.lv2 zam-plugins-lv2 zam-plugins-lv2 calf
 ```
 
-### Instalação do ambiente de trabalho (XFCE)
+### Instalação do ambiente de trabalho (XFCE) ❤️
 
 ```shell
 pacman -S --needed --noconfirm xfce4 xfce4-goodies appmenu-gtk-module libdbusmenu-glib lightdm lightdm-gtk-greeter
