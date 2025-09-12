@@ -23,7 +23,7 @@ Eu uso o BitTorrent para evitar corromper a imagem durante o download, e para gr
 eu estiver no Linux, uso `dd` com o comando abaixo:
 
 ```shell
-dd bs=4M if=archlinux-<VERSION>-x86_64.iso of=/dev/sdX conv=fsync oflag=direct status=progress;
+dd bs=4M if=archlinux-<VERSION>-x86_64.iso of=/dev/sdX conv=fsync oflag=direct status=progress
 ```
 
 > Nota: Substitua o sdX pelo flash drive real.
@@ -37,7 +37,7 @@ Quando já estou dentro da ISO do **Arch Linux**, sigo esses passos:
 Atribuo layout do teclado para `br-abnt2`, que é o que eu uso:
 
 ```shell
-loadkeys br-abnt2;
+loadkeys br-abnt2
 ```
 
 ## Conexão com a internet
@@ -136,7 +136,7 @@ Tabela com a partição de boot separada em duas deve ficar assim:
 Para realizar o particionamento, geralmente eu uso o `cfdisk`:
 
 ```shell
-cfdisk /dev/sdX;
+cfdisk /dev/sdX
 ```
 
 > Nota: Substituo o sdX pelo dispositivo real, `/dev/sda` e `/dev/sdb`.
