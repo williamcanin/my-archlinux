@@ -95,7 +95,7 @@ passwd
 **(3)** - Agora na outra máquina apenas me conecto:
 
 ```shell
-ssh root@<IP>
+ssh root@192.168.X.XX
 ```
 
 # Particionamento
