@@ -647,11 +647,15 @@ cat << EOF >> /etc/fstab
 EOF
 ```
 
-### ZRam
+### ZRAM
+
+**1** - Instalando o gerenciador de ZRAM:
 
 ```shell
 pacman -S --needed --noconfirm zram-generator
 ```
+
+**2** - Configurando um perfil equilibrado para **ZRAM**:
 
 ```shell
 cat << "EOF" > /etc/systemd/zram-generator.conf
@@ -663,4 +667,45 @@ fs-type = swap
 EOF
 ```
 
+> Nota: Geralmente não forço tanto meu computador a ponto de pedir **ZRAM**, mas caso eu queira um
+perfil mais agressivo, por exemplo para jogar, que necessite de mais **ZRAM**, então eu uso este abaixo:
 
+<details>
+  <summary><strong>ZRAM: Perfil Agressivo </strong></summary>
+
+```shell
+cat << "EOF" > /etc/systemd/zram-generator.conf
+[zram0]
+zram-size = ram * 3/4
+compression-algorithm = lz4
+swap-priority = 100
+fs-type = swap
+EOF
+```
+</details></br>
+
+**3** - Depois de configurar, eu faço um *reset* no daemon e habilito o serviço de **ZRAM**:
+
+```shell
+systemctl daemon-reload;
+systemctl enable --now systemd-zram-setup@zram0.service
+```
+
+### Adicionando um usuário
+
+**1** - Antes, primeiro vou liberar o grupo `sudo` no arquivo `/etc/sudoers` para meu usuário pertencer a
+esse grupo e ter privilégios de sudo:
+
+```shell
+sed -i "s|# %sudo ALL=(ALL:ALL) ALL|%sudo ALL=(ALL:ALL) ALL|g" /etc/sudoers
+```
+
+**2** - Agora começo a criação do grupo do meu usuário, e meu usuário em si:
+
+```shell
+USERNAME_TEMP="will";
+groupadd $USERNAME_TEMP;
+useradd -m -g $USERNAME_TEMP -G users,tty,wheel,games,power,optical,storage,scanner,lp,audio,video,input,mail,root -s /bin/zsh $USERNAME_TEMP;
+groupadd sudo -U $USERNAME_TEMP;
+passwd $USERNAME_TEMP;
+```
