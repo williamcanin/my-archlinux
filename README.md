@@ -188,7 +188,7 @@ terceiro comando, crio um volume lógico especificando o grupo (`linux`).
 
 # Criando e criptografando a unidade /home
 
-**(1)** - Criptografando a unidade `/dev/sdb1`
+**(1)** - Criptografando a unidade `/dev/sdb1`:
 
 ```shell
 cryptsetup -y -v luksFormat /dev/sdb1;
