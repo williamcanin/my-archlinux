@@ -463,6 +463,13 @@ segurança para CPU Intel. Caso eu tenha AMD como CPU, instalo o `amd-code`.
 bootctl --path=/boot install
 ```
 
+<details>
+  <summary><strong>Com partição de boot separada</strong></summary>
+```shell
+bootctl --path=/boot/efi install
+```
+</details></br>
+
 **(3)** - Crio o loader do `systemd-boot`:
 
 ```shell
