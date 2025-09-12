@@ -439,14 +439,10 @@ pacman -S lvm2
 
 # Instalando o bootloader
 
-**systemd-boot:**
-
 Já faz um bom tempo que uso `systemd-boot` por achar o `GRUB` pesado e com recursos que nem preciso.
 
 Minha máquina é **EFI**, por que eu teria que ter um bootloader pra gerenciar *Legacy* também?! 🤔
 
-Atualmente estou usando `systemd-boot` + `UKI` (Unified Kernel Image) ❤️, e esses são os passos que
-faço para instalar.
 
 **(1)** - Primeiro instalo o `efibootmgr` e `intel-ucode`:
 
@@ -476,8 +472,8 @@ bootctl --path=/boot/efi install
 **(3)** - Crio o loader do `systemd-boot`:
 
 ```shell
-ESP_DIR_TEMP="/boot";
-cat << EOF > $ESP_DIR_TEMP/loader/loader.conf
+ESP_DIR="";
+cat << EOF > /boot/${ESP_DIR}loader/loader.conf
 default arch.conf
 timeout 3
 console-mode max
@@ -485,67 +481,112 @@ editor no
 EOF
 ```
 
-> Nota: Está variável de ambiente `ESP_DIR_TEMP` é temporária, é apenas para o momento de instalação.
+> IMPORTANTE: Está variável de ambiente `ESP_DIR` é temporária, é apenas para o momento de instalação.
+Se instalou o sistema com a partição de boot separada, um em `/boot` e outra `/boot/efi`, então a
+variável `ESP_DIR` DEVE ser assim: `ESP_DIR="efi/"`. Caso contrário deixe vazio.
 
-**(4)** - Crio um backup do "preset" primeiro:
+## Usando UKI (Unified Kernel Image)
+
+Atualmente estou usando `systemd-boot` + `UKI` (Unified Kernel Image) ❤️, e esses são os passos que
+faço para instalar.
+
+**(1)** - Crio um backup do "preset" primeiro:
 
 ```shell
 cp /etc/mkinitcpio.d/linux-lts.preset /etc/mkinitcpio.d/linux-lts.preset.backup
 ```
 
-**(5)** - Depois crio um novo `/etc/mkinitcpio.d/linux-lts.preset` com as configurações abaixo:
+**(2)** - Depois crio um novo `/etc/mkinitcpio.d/linux-lts.preset` com as configurações abaixo:
 
 ```shell
 cat << EOF > /etc/mkinitcpio.d/linux-lts.preset
-ESP_DIR="${ESP_DIR_TEMP}"
+ESP_DIR="${ESP_DIR}"
 
 ALL_config="/etc/mkinitcpio.conf"
-ALL_kver="\${ESP_DIR}/vmlinuz-linux-lts"
+ALL_kver="/boot/\${ESP_DIR}vmlinuz-linux-lts"
 ALL_cmdline="root=UUID=$(blkid -s UUID -o value /dev/mapper/linux-arch) rw loglevel=3 nvidia_drm.modeset=1 video=1920x1080@75"
 PRESETS=('default' 'fallback')
 
 default_config="/etc/mkinitcpio.conf"
-default_image="\${ESP_DIR}/initramfs-linux-lts.img"
-default_uki="\${ESP_DIR}/EFI/Linux/arch-linux-lts.efi"
+default_image="/boot/\${ESP_DIR}initramfs-linux-lts.img"
+default_uki="/boot/\${ESP_DIR}EFI/Linux/arch-linux-lts.efi"
 default_options="--splash /usr/share/systemd/bootctl/splash-arch.bmp"
 
 fallback_config="/etc/mkinitcpio.conf"
-fallback_image="\${ESP_DIR}/initramfs-linux-lts-fallback.img"
-fallback_uki="\${ESP_DIR}/EFI/Linux/arch-linux-lts-fallback.efi"
+fallback_image="/boot/\${ESP_DIR}/initramfs-linux-lts-fallback.img"
+fallback_uki="/boot/\${ESP_DIR}/EFI/Linux/arch-linux-lts-fallback.efi"
 fallback_options="-S autodetect"
 EOF
 ```
 
-> **IMPORTANTE:** Se usar a EFI fora do `/boot`, em `/boot/efi`, deixar assim `ESP_DIR="/boot/efi"`.
+> **IMPORTANTE:** Se usar a EFI fora do `/boot`, em `/boot/efi`, deixar assim `ESP_DIR="efi/"`.
 
 > Dica: Caso eu queira um boot menos verboso e com splash, eu adiciono na opção `ALL_cmdline` os
 parâmentros: `quiet splash loglevel=3 systemd.show_status=auto rd.udev.log_level=3`. E depois
 instalo o pacote `plymouth`, e adiciono a flag `plymouth` nos HOOKS do `/etc/mkinitcpio.conf` depois
 de `keymap`.
 
-**(6)** - Agora crio as entradas do `systemd-boot` padrão:
+**(3)** - Agora crio as entradas do `systemd-boot` padrão:
 
 ```shell
-cat << EOF > /boot/loader/entries/arch.conf
+cat << EOF > /boot/${ESP_DIR}loader/entries/arch.conf
 title   Arch Linux LTS
-efi     $ESP_DIR_TEMP/EFI/Linux/arch-linux-lts.efi
+efi     /EFI/Linux/arch-linux-lts.efi
 EOF
 ```
 
-**(7)** - E por final, crio as entradas do `systemd-boot` de fallback:
+**(4)** - E por final, crio as entradas do `systemd-boot` de fallback:
 
 ```shell
-cat << EOF > /boot/loader/entries/arch-fallback.conf
+cat << EOF > /boot/${ESP_DIR}loader/entries/arch-fallback.conf
 title   Arch Linux LTS (Fallback)
-efi     $ESP_DIR_TEMP/EFI/Linux/arch-linux-lts-fallback.efi
+efi     /EFI/Linux/arch-linux-lts-fallback.efi
 EOF
 ```
 
-**(8)** - Reinstalo o kernel:
+**(5)** - Reinstalo o kernel:
 
 ```shell
 pacman -S --noconfirm linux-lts
 ```
+
+
+<details>
+  <summary><strong>Usando Padrão</strong></summary>
+
+Aqui a configuração do systemd-boot muda, em vez de usar UKI, usa os arquivos
+**vmlinuz-linux-lts**, **initramfs-linux-lts.img** e **intel-ucode.img** da iniciar o boot.
+
+**(1)** - Primeiro remover qualquer imagem `.efi` gerada:
+
+```shell
+rm -f /boot/${ESP_DIR}EFI/Linux/arch-linux-lts.efi /boot/${ESP_DIR}EFI/Linux/arch-linux-lts-fallback.efi
+```
+
+**(2)** - Depois eu crio a entrada padrão assim:
+
+```shell
+cat << EOF > /boot/${ESP_DIR}loader/entries/arch.conf
+title Arch Linux (Default)
+linux /vmlinuz-linux-lts
+initrd  /intel-ucode.img
+initrd /initramfs-linux-lts.img
+options root=UUID=$(blkid -s UUID -o value /dev/mapper/linux-arch) rw nvidia_drm.modeset=1 video=1920x1080@75
+EOF
+```
+
+**(2)** - E a entrada de fallback assim:
+
+```shell
+cat << EOF > /boot/${ESP_DIR}loader/entries/arch-fallback.conf
+title Arch Linux (Fallback)
+linux /vmlinuz-linux-lts-fallback
+initrd  /intel-ucode.img
+initrd /initramfs-linux-ltsfallback.img
+options root=UUID=$(blkid -s UUID -o value /dev/mapper/linux-arch) rw nvidia_drm.modeset=1 video=1920x1080@75
+EOF
+```
+</details></br>
 
 # Instalação de drivers gráficos
 
@@ -736,4 +777,23 @@ groupadd $USERNAME_TEMP;
 useradd -m -g $USERNAME_TEMP -G users,tty,wheel,games,power,optical,storage,scanner,lp,audio,video,input,mail,root -s /bin/zsh $USERNAME_TEMP;
 groupadd sudo -U $USERNAME_TEMP;
 passwd $USERNAME_TEMP;
+```
+
+# Idioma e localidade
+
+Esses comandos são necessário para configurar o teclado e idioma do sistema, onde cada linha é um
+comando:
+
+```shell
+timedatectl set-timezone America/Sao_Paulo;
+echo "KEYMAP=br-abnt2" > /etc/vconsole.conf;
+sed -i "s|#en_US.UTF-8 UTF-8|en_US.UTF-8 UTF-8|g" /etc/locale.gen;
+sed -i "s|#pt_BR.UTF-8 UTF-8|pt_BR.UTF-8 UTF-8|g" /etc/locale.gen;
+locale-gen;
+echo LANG=pt_BR.UTF-8 | tee /etc/locale.conf;
+rm -f /etc/localtime && ln -s /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime;
+hwclock --systohc;
+echo "archlinux" | tee /etc/hostname;
+printf "127.0.0.1        archlinux\n" >> /etc/hosts;
+echo KEYMAP=br-abnt2 | tee /etc/vconsole.conf;
 ```
