@@ -23,7 +23,7 @@ Eu uso o BitTorrent para evitar corromper a imagem durante o download, e para gr
 eu estiver no Linux, uso `dd` com o comando abaixo:
 
 ```shell
-dd bs=4M if=archlinux-<VERSION>-x86_64.iso of=/dev/sdX conv=fsync oflag=direct status=progress
+dd bs=4M if=archlinux-<VERSION>-x86_64.iso of=/dev/sdX conv=fsync oflag=direct status=progress;
 ```
 
 > Nota: Substitua o sdX pelo flash drive real.
@@ -37,7 +37,7 @@ Quando já estou dentro da ISO do **Arch Linux**, sigo esses passos:
 Atribuo layout do teclado para `br-abnt2`, que é o que eu uso:
 
 ```shell
-loadkeys br-abnt2
+loadkeys br-abnt2;
 ```
 
 ## Conexão com a internet
@@ -52,7 +52,7 @@ Apenas conecto o cabo de rede e já tenho internet na ISO do **Arch Linux**.
   <summary>Via Wi-Fi:</summary>
 
 ```shell
-systemctl start iwd
+systemctl start iwd;
 iwctl
 ```
 
@@ -136,7 +136,7 @@ Tabela com a partição de boot separada em duas deve ficar assim:
 Para realizar o particionamento, geralmente eu uso o `cfdisk`:
 
 ```shell
-cfdisk /dev/sdX
+cfdisk /dev/sdX;
 ```
 
 > Nota: Substituo o sdX pelo dispositivo real, `/dev/sda` e `/dev/sdb`.
@@ -151,9 +151,9 @@ Gosto de usar **LVM** para ter controle sobre minhas partições, caso eu queira
 sem ter problema de corromper dados. Para isso, os comando que uso são simples:
 
 ```shell
-pvcreate /dev/sda3
-vgcreate linux /dev/sda3
-lvcreate -L 120G linux -n arch
+pvcreate /dev/sda3;
+vgcreate linux /dev/sda3;
+lvcreate -L 120G linux -n arch;
 ```
 
 > NOTA: No segundo comando, o nome `linux` é o nome do grupo que defino (pode ser qualquer nome), no
@@ -162,8 +162,8 @@ terceiro comando, crio um volume lógico especificando o grupo (`linux`).
 ## Criando e criptografando a unidade /home
 
 ```shell
-cryptsetup -y -v luksFormat /dev/sdb1
-cryptsetup open /dev/sdb1 home
+cryptsetup -y -v luksFormat /dev/sdb1;
+cryptsetup open /dev/sdb1 home;
 ```
 
 ## Formatação
@@ -171,19 +171,19 @@ cryptsetup open /dev/sdb1 home
 Agora formato cada unidade que foi criada:
 
 ```shell
-mkfs.fat -F 32 /dev/sda1
-mkfs -t ext4 /dev/mapper/linux-arch
-mkfs -t ext4 /dev/mapper/home
+mkfs.fat -F 32 /dev/sda1;
+mkfs -t ext4 /dev/mapper/linux-arch;
+mkfs -t ext4 /dev/mapper/home;
 ```
 
 <details>
   <summary><strong>Com partição de boot separada</strong></summary>
 
 ```shell
-mkfs -t ext4 /dev/sda1
-mkfs.fat -F 32 /dev/sda2
-mkfs -t ext4 /dev/mapper/linux-arch
-mkfs -t ext4 /dev/mapper/home
+mkfs -t ext4 /dev/sda1;
+mkfs.fat -F 32 /dev/sda2;
+mkfs -t ext4 /dev/mapper/linux-arch;
+mkfs -t ext4 /dev/mapper/home;
 ```
 </details></br>
 
@@ -226,19 +226,19 @@ sdb
 Tudo em ordem, agora faço o `mount` das unidades:
 
 ```shell
-mount /dev/mapper/linux-arch /mnt
-mount --mkdir /dev/sda1 /mnt/boot
-mount --mkdir /dev/mapper/home /mnt/home
+mount /dev/mapper/linux-arch /mnt;
+mount --mkdir /dev/sda1 /mnt/boot;
+mount --mkdir /dev/mapper/home /mnt/home;
 ```
 
 <details>
   <summary><strong>Com partição de boot separada</strong></summary>
 
 ```shell
-mount /dev/mapper/linux-arch /mnt
-mount --mkdir /dev/sda1 /mnt/boot
-mount --mkdir /dev/sda2 /mnt/boot/efi
-mount --mkdir /dev/mapper/home /mnt/home
+mount /dev/mapper/linux-arch /mnt;
+mount --mkdir /dev/sda1 /mnt/boot;
+mount --mkdir /dev/sda2 /mnt/boot/efi;
+mount --mkdir /dev/mapper/home /mnt/home;
 ```
 </details></br>
 
@@ -249,11 +249,11 @@ Aqui eu atualizo os `mirrorlist` para o `Brazil` e `US` usando `reflector` já d
 sistema base com o kernel LTS, e alguns pacotes que acho essenciais durante a instalação.
 
 ```shell
-reflector --verbose --country Brazil,US --age 12 --protocol https --sort rate --save /etc/pacman.d/mirrorlist
-pacman -Syy
-pacman -Sy archlinux-keyring
-pacman-key --populate archlinux
-pacstrap -K /mnt base base-devel linux-lts linux-lts-headers linux-firmware systemd systemd-ukify sudo vim dhcpcd wireless_tools wpa_supplicant
+reflector --verbose --country Brazil,US --age 12 --protocol https --sort rate --save /etc/pacman.d/mirrorlist;
+pacman -Syy;
+pacman -Sy archlinux-keyring;
+pacman-key --populate archlinux;
+pacstrap -K /mnt base base-devel linux-lts linux-lts-headers linux-firmware systemd systemd-ukify sudo vim dhcpcd wireless_tools wpa_supplicant;
 ```
 
 ## Gerando o /etc/fstab
@@ -338,8 +338,8 @@ Então, eu uso o `systemd-networkd` que é mais leve e objetivo.
 **(1)** - Caso eu já tenho o `NetworkManager` instalado, eu apenas desabilito e faço o `mask`:
 
 ```shell
-systemctl disable --now NetworkManager.service
-systemctl mask NetworkManager.service
+systemctl disable --now NetworkManager.service;
+systemctl mask NetworkManager.service;
 ```
 
 **(2)** - Depois habilito o `systemd-networkd` e `systemd-resolved`:
@@ -460,7 +460,7 @@ bootctl --path=/boot install
 **(3)** - Crio o loader do `systemd-boot`:
 
 ```shell
-ESP_DIR="/boot"
+ESP_DIR="/boot";
 cat << EOF > $ESP_DIR/loader/loader.conf
 default arch.conf
 timeout 3
@@ -626,8 +626,8 @@ configuração no `/etc/fstab`, e também já deixa comentado para uma partiçã
 tenha um dia. Para essas configurações, eu faço os comandos:
 
 ```shell
-mkdir -p /media/cdrom0; mkdir /mnt/floppy; mkdir /mnt/windows
-ln -s /media/cdrom0 /media/cdrom
+mkdir -p /media/cdrom0; mkdir /mnt/floppy; mkdir /mnt/windows;
+ln -s /media/cdrom0 /media/cdrom;
 cat << EOF >> /etc/fstab
 ### CDROM
 /dev/sr0  /media/cdrom0  udf,iso9660 user,noauto  0 0
