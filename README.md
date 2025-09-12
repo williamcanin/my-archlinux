@@ -73,6 +73,33 @@ quit
 
 > NOTA: Após configurar a internet, faço um `ping 8.8.8.8` para verificar. 😆
 
+# Conexão SSH
+
+Geralmente faço a instalação do **Arch Linux** na minha máquina via SSH, ou seja, de outra máquina,
+assim eu consigo abrir este guia e apenas copiar e colar os comandos do que ficar digitando cada
+comando.
+
+**(1)** - Para habilitar o SSH na ISO do **Arch Linux** é simples, a ISO já vem com o SSH instalado,
+ então basta ativar:
+
+```shell
+systemct start sshd
+```
+
+**(2)** - Após isso crio a senha do root da imagem ISO para poder fazer a conexão SSH:
+
+```shell
+passwd
+```
+
+**(3)** - Agora na outra máquina apenas me conecto:
+
+```shell
+ssh root@<IP>
+```
+
+
+
 # Particionamento
 
 Aqui é a parte MAIS DELICADA, tenho o MÁXIMO de atenção para não escolher a unidade errada. hehe 😁
