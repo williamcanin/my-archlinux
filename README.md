@@ -98,8 +98,6 @@ passwd
 ssh root@<IP>
 ```
 
-
-
 # Particionamento
 
 Aqui é a parte MAIS DELICADA, tenho o MÁXIMO de atenção para não escolher a unidade errada. hehe 😁
@@ -190,8 +188,18 @@ terceiro comando, crio um volume lógico especificando o grupo (`linux`).
 
 # Criando e criptografando a unidade /home
 
+**(1)** - Criptografando a unidade `/dev/sdb1`
+
 ```shell
 cryptsetup -y -v luksFormat /dev/sdb1;
+```
+
+> IMPORTANTE!!! Se você já tem a unidade `/dev/mapper/home` criptografada com seus arquivos não tem
+necessidade deste passo **1** senão irá perder os arquivos. PULE para o passo **2**.
+
+**(2)** - Criando/abrindo a unidade criptografada:
+
+```shell
 cryptsetup open /dev/sdb1 home;
 ```
 
@@ -216,7 +224,8 @@ mkfs -t ext4 /dev/mapper/home;
 ```
 </details></br>
 
-> IMPORTANTE! Se já tiver a partição `/dev/mapper/home` com arquivos, não formatar senão perde TODOS os arquivos.
+> IMPORTANTE!!! Se já tiver a partição `/dev/mapper/home` com arquivos, não formatar senão perde
+TODOS os arquivos.
 
 Depois de todas unidades estarem criadas e formatadas, gosto de verificar com o comando: `lsblk -f`:
 
