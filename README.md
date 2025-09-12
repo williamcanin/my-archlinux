@@ -34,7 +34,7 @@ dd bs=4M if=archlinux-<VERSION>-x86_64.iso of=/dev/sdX conv=fsync oflag=direct s
 
 Quando já estou dentro da ISO do **Arch Linux**, sigo esses passos:
 
-## Layout
+# Layout
 
 Atribuo layout do teclado para `br-abnt2`, que é o que eu uso:
 
@@ -42,7 +42,7 @@ Atribuo layout do teclado para `br-abnt2`, que é o que eu uso:
 loadkeys br-abnt2
 ```
 
-## Conexão com a internet
+# Conexão com a internet
 
 **Via Cabo:**
 
@@ -73,7 +73,7 @@ quit
 
 > NOTA: Após configurar a internet, faço um `ping 8.8.8.8` para verificar. 😆
 
-## Particionamento
+# Particionamento
 
 Aqui é a parte MAIS DELICADA, tenho o MÁXIMO de atenção para não escolher a unidade errada. hehe 😁
 
@@ -81,7 +81,7 @@ Não vou colocar comandos de como realizar o particionamento, apenas relatar alg
 IMPORTANTES e o esboço (tabela) de como o particionamento para a instalação do **Arch Linux** fica
 em minha máquina.
 
-### Tabela
+## Tabela
 
 | Dispositivo | Tamanho |    Tipo             |  Local  |
 |-------------|---------|---------------------|---------|
@@ -92,7 +92,7 @@ em minha máquina.
 <details>
   <summary><strong>>>> Informações 🤔</strong></summary>
 
-### Boot
+## Boot
 
 O **Arch Linux** precisa apenas de uma partição de boot, a `/boot` do tipo **EFI System**,
 MAS, caso queira fazer um dual-boot com outras distros, que necessita de duas
@@ -111,18 +111,18 @@ apontando para `/boot/efi`, tive que modificar essa configuração no arquivo
 nem compartilhamento do **systemd-boot** com outros sistemas, porém, eu vou relatado cada passo que
 precisa fazer caso seja uma instalação com `/boot` e `/boot/efi`.
 
-### Sistema
+## Sistema
 
 Instalo o **Arch Linux** em um SSD de **250 Gigabytes** (*250Gb*), mas eu apenas deixo **120Gb**,
 não uso mais que isso para o sistema **Arch Linux**. Atualmente estou usando o sistema de
 arquivo `ext4`.
 
-### Home
+## Home
 
 Tenho um HDD de **1 Terabyte** (*1Tb*) para minha `/home`, e criptografo a mesma usando o
 LUKS (*dm-crypt*), com o sistema de arquivos `ext4`.
 
-### Tabela
+## Tabela
 
 Tabela com a partição de boot separada em duas deve ficar assim:
 
@@ -144,7 +144,7 @@ cfdisk /dev/sdX
 > Nota: Substituo o sdX pelo dispositivo real, `/dev/sda` e `/dev/sdb`.
 
 
-## Criando estrutura LVM para o sistema
+# Criando estrutura LVM para o sistema
 
 No **LVM**, precisa criar um **Volume Físico** (PV), **Grupo** (VG), e um **Volume Lógico** (LV),
 onde o grupo vai fazer parte de um volume físico, e o volume lógico vai estar dentro de um grupo.
@@ -161,14 +161,14 @@ lvcreate -L 120G linux -n arch;
 > NOTA: No segundo comando, o nome `linux` é o nome do grupo que defino (pode ser qualquer nome), no
 terceiro comando, crio um volume lógico especificando o grupo (`linux`).
 
-## Criando e criptografando a unidade /home
+# Criando e criptografando a unidade /home
 
 ```shell
 cryptsetup -y -v luksFormat /dev/sdb1;
 cryptsetup open /dev/sdb1 home;
 ```
 
-## Formatação
+# Formatação
 
 Agora formato cada unidade que foi criada:
 
@@ -223,7 +223,7 @@ sdb
 </details></br>
 
 
-## Montagem das unidades
+# Montagem das unidades
 
 Tudo em ordem, agora faço o `mount` das unidades:
 
@@ -244,7 +244,7 @@ mount --mkdir /dev/mapper/home /mnt/home;
 ```
 </details></br>
 
-## Instalando o sistema base do Arch Linux
+# Instalando o sistema base do Arch Linux
 
 Aqui eu atualizo os `mirrorlist` para o `Brazil` e `US` usando `reflector` já disponível na ISO do
 **Arch Linux**, e logo em seguida atualizo as chaves e o cache, para depois fazer instalação do
@@ -258,7 +258,7 @@ pacman-key --populate archlinux;
 pacstrap -K /mnt base base-devel linux-lts linux-lts-headers linux-firmware systemd systemd-ukify sudo vim dhcpcd wireless_tools wpa_supplicant;
 ```
 
-## Gerando o /etc/fstab
+# Gerando o /etc/fstab
 
 Aqui não tenho muito o que dizer, apenas gero o `/etc/fstab` para que todas minhas partições montadas
 sejam configuradas durando o boot da máquina.
@@ -268,13 +268,13 @@ sejam configuradas durando o boot da máquina.
 genfstab -U -p /mnt >> /mnt/etc/fstab
 ```
 
-## Entrando no sistema pré-instalado
+# Entrando no sistema pré-instalado
 
 ```shell
 arch-chroot /mnt /bin/bash
 ```
 
-### Atribuindo senha de `root`
+# Atribuindo senha de `root`
 
 A primeira coisa que gosto de fazer é atribuir uma senha para o usuário `root`:
 
@@ -282,7 +282,7 @@ A primeira coisa que gosto de fazer é atribuir uma senha para o usuário `root`
 passwd
 ```
 
-### Configurando o Pacman
+# Configurando o Pacman
 
 Aqui habilito o repositório `[multilib]` e ignoro alguns pacotes de serem instalados e atualizados.
 
@@ -328,7 +328,7 @@ Server = https://williamcanin.gitlab.io/archlinux/stable/x86_64
 pacman -Syy
 ```
 
-### Configurando a rede de internet
+# Configurando internet
 
 Como atualmente uso uma conexão via cabo, não tenho necessidade de usar o `NetworkManager` como
 gerenciador de conexão com internet para ficar me dando várias configurações insignificantes.
@@ -374,7 +374,7 @@ DNS=8.8.8.8
 ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 ```
 
-### Configurando /home criptografado
+# Configurando /home
 
 O arquivo de configuração para dispositivos criptografados lançados "durante o boot" no
 **Arch Linux**, é o `/etc/crypttab.initramfs`. Por padrão ele não existe, então eu crio o mesmo
@@ -406,7 +406,7 @@ EOF
 > ATENÇÃO!!! Observe que para inserir a configuração no `/etc/fstab`, estou usando **tee -a**, este
 parâmetro **-a** significa **append**, adicionar, se emitir ele, irá sobrescrever o `/etc/fstab`.
 
-### Configurando MODULES e HOOKS do /etc/mkinitcpio.conf
+# Configurando o /etc/mkinitcpio.conf
 
 **(1)** - Aqui adiciono os módulos que preciso que carreguem durante o boot:
 
@@ -437,7 +437,9 @@ sed -i "s|^HOOKS=.*|HOOKS=(base systemd autodetect keymap modconf kms keyboard s
 pacman -S lvm2
 ```
 
-### Instalando o bootloader systemd-boot
+# Instalando o bootloader
+
+**systemd-boot:**
 
 Já faz um bom tempo que uso `systemd-boot` por achar o `GRUB` pesado e com recursos que nem preciso.
 
@@ -536,7 +538,7 @@ EOF
 pacman -S --noconfirm linux-lts
 ```
 
-### Instalação de drivers gráficos
+# Instalação de drivers gráficos
 
 **OpenGL/Vulkan**
 
@@ -578,14 +580,16 @@ systemctl set-default multi-user.target
 ```
 </details></br>
 
-### Instalação de drivers e aplicações de áudio
+# Instalação de drivers de áudio
 
 ```shell
 pacman -S --needed --noconfirm pipewire pipewire-audio pipewire-pulse pipewire-alsa pipewire-jack \
-easyeffects lsp-plugins-lv2 mda.lv2 zam-plugins-lv2 zam-plugins-lv2 calf
+lsp-plugins-lv2 mda.lv2 zam-plugins-lv2 zam-plugins-lv2
 ```
 
-### Instalação do ambiente de trabalho (XFCE) ❤️
+# Ambiente de trabalho (XFCE) ❤️
+
+Meu ambiente principalmente atualmente é o XFCE, leve e funcional:
 
 ```shell
 pacman -S --needed --noconfirm xfce4 xfce4-goodies appmenu-gtk-module libdbusmenu-glib lightdm lightdm-gtk-greeter
@@ -609,7 +613,9 @@ gnome-browser-connector gnome-tweaks gdm
 ```
 </details></br>
 
-### Instalação de aplicações básicas que uso
+# Instalação de aplicações
+
+Algumas aplicações básicas que uso:
 
 ```shell
 pacman -S --needed --noconfirm pacman-contrib dkms xdg-user-dirs ntfs-3g udisks2 dosfstools mtools \
@@ -617,16 +623,18 @@ cpupower reflector samba git openssh tor virtualbox-guest-utils vlc transmission
 ttf-dejavu ttf-dejavu-nerd terminator veracrypt zip unzip xarchiver gimp inkscape pavucontrol make \
 gcc go ruby perl tk python nodejs npm arch-wiki-docs arch-wiki-lite zeal qemu-full virt-manager \
 piper steam-native-runtime firefox libreoffice-fresh libreoffice-fresh-pt-br terminator galculator \
-leafpad smplayer gparted rofimoji
+leafpad calf smplayer gparted rofimoji easyeffects
 ```
 
-### Habilitando alguns serviços essenciais durante o boot
+# Habilitando serviços
+
+Neste momento habilito alguns servições para iniciar durante o boot:
 
 ```shell
 systemctl enable iptables.service smb.service nmb.service tor.service
 ```
 
-### Complementando o /etc/fstab
+# Complementando o /etc/fstab
 
 Meu computador não tem leitor de disquete e CD/DVD (e quem tem?), mas mesmo asim eu mantenho a
 configuração no `/etc/fstab`, e também já deixa comentado para uma partição **Windows**, caso eu
@@ -647,7 +655,7 @@ cat << EOF >> /etc/fstab
 EOF
 ```
 
-### ZRAM
+# ZRAM
 
 **1** - Instalando o gerenciador de ZRAM:
 
@@ -691,7 +699,7 @@ systemctl daemon-reload;
 systemctl enable --now systemd-zram-setup@zram0.service
 ```
 
-### Adicionando um usuário
+# Adicionando um usuário
 
 **1** - Antes, primeiro vou liberar o grupo `sudo` no arquivo `/etc/sudoers` para meu usuário pertencer a
 esse grupo e ter privilégios de sudo:
