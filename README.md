@@ -4,6 +4,8 @@
   </a>
 </h1>
 
+Ei, beleza? 👍
+
 Este é o guia que fiz, e uso atualmente para instalar o [Arch Linux](https://archlinux.org/) em
 minha máquina.
 
@@ -46,8 +48,6 @@ loadkeys br-abnt2
 
 Apenas conecto o cabo de rede e já tenho internet na ISO do **Arch Linux**.
 
-> NOTA: Após configurar a internet, faço um `ping 8.8.8.8` para verificar.
-
 <details>
   <summary>Via Wi-Fi:</summary>
 
@@ -71,9 +71,11 @@ quit
 ```
 </details>
 
+> NOTA: Após configurar a internet, faço um `ping 8.8.8.8` para verificar. 😆
+
 ## Particionamento
 
-Aqui é a parte MAIS DELICADA, tenho o MÁXIMO de atenção para não escolher a unidade errada. hehe
+Aqui é a parte MAIS DELICADA, tenho o MÁXIMO de atenção para não escolher a unidade errada. hehe 😁
 
 Não vou colocar comandos de como realizar o particionamento, apenas relatar algumas informações
 IMPORTANTES e o esboço (tabela) de como o particionamento para a instalação do **Arch Linux** fica
@@ -613,7 +615,7 @@ cpupower reflector samba git openssh tor virtualbox-guest-utils vlc transmission
 ttf-dejavu ttf-dejavu-nerd terminator veracrypt zip unzip xarchiver gimp inkscape pavucontrol make \
 gcc go ruby perl tk python nodejs npm arch-wiki-docs arch-wiki-lite zeal qemu-full virt-manager \
 piper steam-native-runtime firefox libreoffice-fresh libreoffice-fresh-pt-br terminator galculator \
-leafpad smplayer gparted
+leafpad smplayer gparted rofimoji
 ```
 
 ### Habilitando alguns serviços essenciais durante o boot
