@@ -604,6 +604,8 @@ pacman -S --needed --noconfirm xfce4 xfce4-goodies appmenu-gtk-module libdbusmen
 <details>
   <summary><strong>Instalação do ambiente de trabalho (GNOME)</strong></summary>
 
+Minha realação com GNOME é entre amor e ódio. Instalo mas deixo com um ambiente de fallback:
+
 **Mínimo:**
 
 ```shell
@@ -663,13 +665,15 @@ EOF
 
 # ZRAM
 
-**1** - Instalando o gerenciador de ZRAM:
+Geralmente não forço tanto meu computador a ponto de usar **zram**, mas mesmo assim eu configuro:
+
+**1** - Instalando o gerenciador de zram:
 
 ```shell
 pacman -S --needed --noconfirm zram-generator
 ```
 
-**2** - Configurando um perfil equilibrado para **ZRAM**:
+**2** - Configurando um perfil equilibrado para **zram**:
 
 ```shell
 cat << "EOF" > /etc/systemd/zram-generator.conf
@@ -681,8 +685,8 @@ fs-type = swap
 EOF
 ```
 
-> Nota: Geralmente não forço tanto meu computador a ponto de pedir **ZRAM**, mas caso eu queira um
-perfil mais agressivo, por exemplo para jogar, que necessite de mais **ZRAM**, então eu uso este abaixo:
+> Nota: Caso eu queira um perfil mais agressivo, para jogar por exemplo, que necessite de **zram**,
+então eu uso este abaixo:
 
 <details>
   <summary><strong>ZRAM: Perfil Agressivo </strong></summary>
