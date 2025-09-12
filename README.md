@@ -466,6 +466,8 @@ bootctl --path=/boot install
 <details>
   <summary><strong>Com partição de boot separada</strong></summary>
 
+Se instalou o sistema com a partição de boot separada, então a instalação é assim:
+
 ```shell
 bootctl --path=/boot/efi install
 ```
