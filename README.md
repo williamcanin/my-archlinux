@@ -118,7 +118,7 @@ arquivo `ext4`.
 ### Home
 
 Tenho um HDD de **1 Terabyte** (*1Tb*) para minha `/home`, e criptografo a mesma usando o
-LUKS (*dm_crypt*), com o sistema de arquivos `ext4`.
+LUKS (*dm-crypt*), com o sistema de arquivos `ext4`.
 
 ### Tabela
 
@@ -380,8 +380,10 @@ atribuindo o `UUID` do dispositivo criptografado LUKS, que no caso é o `/dev/sd
 **(1)** - Crio o arquivo `/etc/crypttab.initramfs` inserindo o `UUID` com a ajuda do `blkid`:
 
 ```shell
-echo "\n\n #/dev/sdb1" | tee -a /etc/crypttab.initramfs
-echo "home UUID=$(blkid -s UUID -o value /dev/sdb1) none luks,tries=0,timeout=0" | tee -a /etc/crypttab.initramfs
+cat << EOF >> /etc/crypttab.initramfs
+# /dev/sdb1
+home UUID=$(blkid -s UUID -o value /dev/sdb1) none luks,tries=0,timeout=0
+EOF
 ```
 
 > ATENÇÃO!!! Não confundir `/dev/sdb1` (dispositivo LUKS) com `/dev/mapper/home`
@@ -392,8 +394,10 @@ echo "home UUID=$(blkid -s UUID -o value /dev/sdb1) none luks,tries=0,timeout=0"
 mas dessa vez no `/etc/fstab`:
 
 ```shell
-echo "\n\n #/dev/mapper/home" | tee -a /etc/fstab
-echo "UUID=$(blkid -s UUID -o value /dev/mapper/home) /home ext4 rw,relatime,data=ordered 0 2" | tee -a /etc/fstab
+cat << EOF >> /etc/fstab
+# /dev/mapper/home
+UUID=$(blkid -s UUID -o value /dev/mapper/home) /home ext4 rw,relatime,data=ordered 0 2
+EOF
 ```
 
 > ATENÇÃO!!! Observe que para inserir a configuração no `/etc/fstab`, estou usando **tee -a**, este
@@ -457,61 +461,70 @@ bootctl --path=/boot install
 
 ```shell
 ESP_DIR="/boot"
-echo "default arch.conf\ntimeout 3\nconsole-mode max\neditor no" | tee $ESP_DIR/loader/loader.conf
+cat << EOF > $ESP_DIR/loader/loader.conf
+default arch.conf
+timeout 3
+console-mode max
+editor no
+EOF
 ```
 
 > IMPORTANTE: Se eu usar a EFI fora do `/boot`, em `/boot/efi` futuramente, deixo assim
 `ESP_DIR="/boot/efi"`.
 
-**(4)** - Abro o `/etc/mkinitcpio.d/linux-lts.preset` com `vim` e adiciono a configuração abaixo:
+**(4)** - Crio um backup do "preset" primeiro:
 
-```conf
-ESP_DIR="<ESP_DIR>"
+```shell
+cp /etc/mkinitcpio.d/linux-lts.preset /etc/mkinitcpio.d/linux-lts.preset.backup
+```
+
+**(5)** - Depois crio um novo `/etc/mkinitcpio.d/linux-lts.preset` com as configurações abaixo:
+
+```shell
+cat << EOF > /etc/mkinitcpio.d/linux-lts.preset
+ESP_DIR="${ESP_DIR}"
 
 ALL_config="/etc/mkinitcpio.conf"
-ALL_kver="${ESP_DIR}/vmlinuz-linux-lts"
-ALL_cmdline="root=UUID=<UUID> rw loglevel=3 nvidia_drm.modeset=1 video=1920x1080@75"
+ALL_kver="\${ESP_DIR}/vmlinuz-linux-lts"
+ALL_cmdline="root=UUID=$(blkid -s UUID -o value /dev/mapper/linux-arch) rw loglevel=3 nvidia_drm.modeset=1 video=1920x1080@75"
 PRESETS=('default' 'fallback')
 
 default_config="/etc/mkinitcpio.conf"
-default_image="${ESP_DIR}/initramfs-linux-lts.img"
-default_uki="${ESP_DIR}/EFI/Linux/arch-linux-lts.efi"
+default_image="\${ESP_DIR}/initramfs-linux-lts.img"
+default_uki="\${ESP_DIR}/EFI/Linux/arch-linux-lts.efi"
 default_options="--splash /usr/share/systemd/bootctl/splash-arch.bmp"
 
 fallback_config="/etc/mkinitcpio.conf"
-fallback_image="${ESP_DIR}/initramfs-linux-lts-fallback.img"
-fallback_uki="${ESP_DIR}/EFI/Linux/arch-linux-lts-fallback.efi"
+fallback_image="\${ESP_DIR}/initramfs-linux-lts-fallback.img"
+fallback_uki="\${ESP_DIR}/EFI/Linux/arch-linux-lts-fallback.efi"
 fallback_options="-S autodetect"
+EOF
 ```
 
-> Nota: Caso eu queira um boot menos verboso e com splash, eu adiciono na opção `ALL_cmdline` os
+> Dica: Caso eu queira um boot menos verboso e com splash, eu adiciono na opção `ALL_cmdline` os
 parâmentros: `quiet splash loglevel=3 systemd.show_status=auto rd.udev.log_level=3`. E depois
 instalo o pacote `plymouth`, e adiciono a flag `plymouth` nos HOOKS do `/etc/mkinitcpio.conf` depois
 de `keymap`.
 
-**(4)** - Altero o `<UUID>` pelo `UUID` da partição `/dev/mapper/linux-arch` com os comandos:
+**(6)** - Agora crio as entradas do `systemd-boot` padrão:
 
 ```shell
-sed -i "s|<ESP_DIR>|$ESP_DIR|g" /etc/mkinitcpio.d/linux-lts.preset
-sed -i "s|<UUID>|$(blkid -s UUID -o value /dev/mapper/linux-arch)|g" /etc/mkinitcpio.d/linux-lts.preset
+cat << EOF > /boot/loader/entries/arch.conf
+title   Arch Linux LTS
+efi     $ESP_DIR/EFI/Linux/arch-linux-lts.efi
+EOF
 ```
 
-**(5)** - Agora crio as entradas do `systemd-boot` padrão:
+**(7)** - E por final, crio as entradas do `systemd-boot` de fallback:
 
 ```shell
-
-echo "title   Arch Linux LTS" | tee -a /boot/loader/entries/arch.conf
-echo "efi     $ESP_DIR/EFI/Linux/arch-linux-lts.efi" | tee -a /boot/loader/entries/arch.conf
+cat << EOF > /boot/loader/entries/arch-fallback.conf
+title   Arch Linux LTS (Fallback)
+efi     $ESP_DIR/EFI/Linux/arch-linux-lts-fallback.efi
+EOF
 ```
 
-**(6)** - E por final, crio as entradas do `systemd-boot` de fallback:
-
-```shell
-echo "title   Arch Linux LTS (Fallback)" | tee -a /boot/loader/entries/arch-fallback.conf
-echo "efi     $ESP_DIR/EFI/Linux/arch-linux-lts-fallback.efi" | tee -a /boot/loader/entries/arch-fallback.conf
-```
-
-**(7)** - Reinstalo o kernel:
+**(8)** - Reinstalo o kernel:
 
 ```shell
 pacman -S --noconfirm linux-lts
@@ -599,3 +612,48 @@ gcc go ruby perl tk python nodejs npm arch-wiki-docs arch-wiki-lite zeal qemu-fu
 piper steam-native-runtime firefox libreoffice-fresh libreoffice-fresh-pt-br terminator galculator \
 leafpad smplayer gparted
 ```
+
+### Habilitando alguns serviços essenciais durante o boot
+
+```shell
+systemctl enable iptables.service smb.service nmb.service tor.service
+```
+
+### Complementando o /etc/fstab
+
+Meu computador não tem leitor de disquete e CD/DVD (e quem tem?), mas mesmo asim eu mantenho a
+configuração no `/etc/fstab`, e também já deixa comentado para uma partição **Windows**, caso eu
+tenha um dia. Para essas configurações, eu faço os comandos:
+
+```shell
+mkdir -p /media/cdrom0; mkdir /mnt/floppy; mkdir /mnt/windows
+ln -s /media/cdrom0 /media/cdrom
+cat << EOF >> /etc/fstab
+### CDROM
+/dev/sr0  /media/cdrom0  udf,iso9660 user,noauto  0 0
+
+### Floppy
+/dev/fd0  /mnt/floppy  auto  defaults,user,noauto  0 0
+
+### Windows (optional)
+#UUID=XXXXX-XXXXX-XXXXX /mnt/windows  ntfs-3g defaults,user,rw,auto  0 0
+EOF
+```
+
+### ZRam
+
+```shell
+pacman -S --needed --noconfirm zram-generator
+```
+
+```shell
+cat << "EOF" > /etc/systemd/zram-generator.conf
+[zram0]
+zram-size = ram / 4
+compression-algorithm = zstd
+swap-priority = 50
+fs-type = swap
+EOF
+```
+
+
