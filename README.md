@@ -563,10 +563,11 @@ pacman -S --noconfirm  xf86-video-nouveau vulkan-nouveau
   <summary><strong>NVIDIA (proprietary)</strong></summary>
 
 Como já relatei acima, não uso o driver proprietário da NVIDIA do repo do **Arch Linux** por
-algumas incompatibilidades que tive na última versão.
+algumas incompatibilidades que tive na última versão, mas mesmo assim vou deixar os paacotes
+essenciais que se deve instalar:
 
 ```shell
-pacman -S --needed --noconfirm nvidia nvidia-utils lib32-nvidia-utils nvidia-settings opencl-nvidia
+pacman -S --needed --noconfirm nvidia nvidia-utils lib32-nvidia-utils nvidia-settings opencl-nvidia;
 systemctl set-default multi-user.target
 ```
 </details></br>
