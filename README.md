@@ -711,14 +711,14 @@ systemctl enable --now systemd-zram-setup@zram0.service
 
 # Adicionando um usuário
 
-**1** - Antes, primeiro vou liberar o grupo `sudo` no arquivo `/etc/sudoers` para meu usuário pertencer a
+**1** - Antes, vou liberar o grupo `sudo` no arquivo `/etc/sudoers` para meu usuário pertencer a
 esse grupo e ter privilégios de sudo:
 
 ```shell
 sed -i "s|# %sudo ALL=(ALL:ALL) ALL|%sudo ALL=(ALL:ALL) ALL|g" /etc/sudoers
 ```
 
-**2** - Agora começo a criação do grupo do meu usuário, e meu usuário em si:
+**2** - Agora começo a criação do grupo do meu usuário, e a criação do meu usuário em si:
 
 ```shell
 USERNAME_TEMP="will";
