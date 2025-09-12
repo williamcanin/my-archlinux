@@ -422,14 +422,14 @@ dispositivos USB.
 eu não acrescento os módulos da minha GPU (NVIDIA) para não dar "*flicker*" na tela durante o boot
 ocasionando quebra de linha do cursor no passphrase da `/home`.
 
-**(2)** - Nos HOOKS adiciono a opção de criptografia e **LVM**. Antigamente eu usava o `plymouth`
-depois de `keymap` para ter um boot com splash, mas hoje prefiro o boot verboso para averiguar
-alguma mensagem de erro, ou demora caso ocorra. Então faço assim:
-
+**(2)** - Nos HOOKS adiciono a opção de criptografia e **LVM**. Então faço assim:
 
 ```shell
 sed -i "s|^HOOKS=.*|HOOKS=(base systemd autodetect keymap modconf kms keyboard sd-vconsole block sd-encrypt lvm2 filesystems fsck)|g" /etc/mkinitcpio.conf
 ```
+
+> Nota: Antigamente eu usava o `plymouth` depois de `keymap` para ter um boot com splash, mas hoje
+prefiro o boot verboso para averiguar alguma mensagem de erro, ou demora caso ocorra.
 
 **(3)** - Agora instalo o pacote `lvm2`:
 
@@ -448,14 +448,14 @@ Minha máquina é **EFI**, por que eu teria que ter um bootloader pra gerenciar 
 Atualmente estou usando `systemd-boot` + `UKI` (Unified Kernel Image) ❤️, e esses são os passos que
 faço para instalar.
 
-**(1)** - Primeiro instalo o `efibootmgr` e `intel-ucode` (O `efibootmgr` é um "gerenciador" de
-bootloader EFI, e o `intel-ucode` é um microcódigo de segurança para CPU Intel):
+**(1)** - Primeiro instalo o `efibootmgr` e `intel-ucode`:
 
 ```shell
 pacman -S --noconfirm efibootmgr intel-ucode
 ```
 
-> Nota: Caso eu tenha AMD como CPU, instalo o `amd-code`.
+> Nota: O `efibootmgr` é um "gerenciador" de bootloader EFI, e o `intel-ucode` é um microcódigo de
+segurança para CPU Intel. Caso eu tenha AMD como CPU, instalo o `amd-code`.
 
 **(2)** - Depois faço de fato a instalação o `systemd-boot` como bootloader:
 
@@ -506,8 +506,7 @@ fallback_options="-S autodetect"
 EOF
 ```
 
-> **IMPORTANTE:** Se eu usar a EFI fora do `/boot`, em `/boot/efi` futuramente, deixo assim
-`ESP_DIR="/boot/efi"`.
+> **IMPORTANTE:** Se usar a EFI fora do `/boot`, em `/boot/efi`, deixar assim `ESP_DIR="/boot/efi"`.
 
 > Dica: Caso eu queira um boot menos verboso e com splash, eu adiciono na opção `ALL_cmdline` os
 parâmentros: `quiet splash loglevel=3 systemd.show_status=auto rd.udev.log_level=3`. E depois
@@ -540,14 +539,17 @@ pacman -S --noconfirm linux-lts
 
 # Instalação de drivers gráficos
 
-**OpenGL/Vulkan**
+Agora vamos de fatos ir para ambiente gráfico. Então começo a instalar alguns drivers essenciais e
+API, como **Vulkan**, **OpenGL**, etc:
 
 ```shell
 pacman -S --needed --noconfirm xorg wayland dialog mesa lib32-mesa xf86-video-vesa vulkan-icd-loader \
 lib32-vulkan-icd-loader vulkan-tools
 ```
 
-**Intel**
+**Intel:**
+
+Como uso [Intel](https://www.intel.com.br/content/www/br/pt/products/details/processors/core.html), então também instalo esses drivers para GPU integrada:
 
 ```shell
 pacman -S --needed --noconfirm mesa-vulkan-intel vulkan-intel linux-firmware-intel
@@ -556,12 +558,16 @@ pacman -S --needed --noconfirm mesa-vulkan-intel vulkan-intel linux-firmware-int
 <details>
   <summary><strong>AMD</strong></summary>
 
+Não estou usando AMD, mas vou deixar os drivers necessários caso eu use futuramente:
+
 ```shell
 pacman -S --needed --noconfirm mesa-vulkan-radeon vulkan-radeon linux-firmware-radeon
 ```
 </details></br>
 
 **NVIDIA (Nouveau)**
+
+Sempe bom ter os drivers da NVIDIA open-source caso a NVIDIA faça alguma nhaca de incompatibilidade:
 
 ```shell
 pacman -S --noconfirm  xf86-video-nouveau vulkan-nouveau
@@ -587,9 +593,9 @@ pacman -S --needed --noconfirm pipewire pipewire-audio pipewire-pulse pipewire-a
 lsp-plugins-lv2 mda.lv2 zam-plugins-lv2 zam-plugins-lv2
 ```
 
-# Ambiente de trabalho (XFCE) ❤️
+# Ambiente de trabalho (XFCE)
 
-Meu ambiente principalmente atualmente é o XFCE, leve e funcional:
+Meu ambiente principalmente atualmente é o XFCE ❤️, leve e funcional:
 
 ```shell
 pacman -S --needed --noconfirm xfce4 xfce4-goodies appmenu-gtk-module libdbusmenu-glib lightdm lightdm-gtk-greeter
