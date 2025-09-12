@@ -594,7 +594,8 @@ gnome-browser-connector gnome-tweaks gdm
 ```shell
 pacman -S --needed --noconfirm pacman-contrib dkms xdg-user-dirs ntfs-3g udisks2 dosfstools mtools \
 cpupower reflector samba git openssh tor virtualbox-guest-utils vlc transmission-gtk gvfs gvfs-smb \
-ttf-dejavu ttf-dejavu-nerd terminator zip unzip xarchiver leafpad gimp inkscape pavucontrol make \
+ttf-dejavu ttf-dejavu-nerd terminator veracrypt zip unzip xarchiver gimp inkscape pavucontrol make \
 gcc go ruby perl tk python nodejs npm arch-wiki-docs arch-wiki-lite zeal qemu-full virt-manager \
-piper firefox libreoffice-fresh libreoffice-fresh-pt-br
+piper steam-native-runtime firefox libreoffice-fresh libreoffice-fresh-pt-br terminator galculator \
+leafpad smplayer gparted
 ```
