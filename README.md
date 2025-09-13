@@ -685,7 +685,8 @@ lsp-plugins-lv2 mda.lv2 zam-plugins-lv2 zam-plugins-lv2
 Meu ambiente principalmente atualmente é o XFCE ❤️, leve e funcional:
 
 ```shell
-pacman -S --needed --noconfirm xfce4 xfce4-goodies appmenu-gtk-module libdbusmenu-glib lightdm lightdm-gtk-greeter
+pacman -S --needed --noconfirm xfce4 xfce4-goodies appmenu-gtk-module libdbusmenu-glib lightdm \
+lightdm-gtk-greeter
 ```
 
 <details>
@@ -718,7 +719,7 @@ cpupower reflector samba git openssh tor virtualbox-guest-utils vlc transmission
 ttf-dejavu ttf-dejavu-nerd terminator veracrypt zip unzip xarchiver gimp inkscape pavucontrol make \
 gcc go ruby perl tk python nodejs npm arch-wiki-docs arch-wiki-lite zeal qemu-full virt-manager \
 piper steam-native-runtime firefox libreoffice-fresh libreoffice-fresh-pt-br terminator galculator \
-leafpad calf smplayer gparted rofimoji easyeffects
+leafpad calf smplayer gparted rofimoji easyeffects gnome-keyring seahorse
 ```
 
 # Habilitando serviços
