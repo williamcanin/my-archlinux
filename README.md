@@ -680,11 +680,11 @@ pacman -S --needed --noconfirm noto-fonts noto-fonts-emoji noto-fonts-cjk ttf-li
 otf-font-awesome ttf-jetbrains-mono ttf-jetbrains-mono-nerd ttf-dejavu-nerd
 ```
 
-# Instalação de drivers de áudio
+# Instalação de drivers de áudio e mixer
 
 ```shell
-pacman -S --needed --noconfirm pipewire pipewire-audio pipewire-pulse pipewire-alsa pipewire-jack \
-lsp-plugins-lv2 mda.lv2 zam-plugins-lv2 zam-plugins-lv2
+pacman -S --needed --noconfirm pipewire wireplumer pipewire-audio pipewire-pulse pipewire-alsa \
+pipewire-jack lib32-pipewire lsp-plugins-lv2 mda.lv2 zam-plugins-lv2 zam-plugins-lv2 pavucontrol
 ```
 
 # Ambiente de trabalho (XFCE)
@@ -723,7 +723,7 @@ Algumas aplicações básicas que uso:
 ```shell
 pacman -S --needed --noconfirm pacman-contrib dkms xdg-user-dirs ntfs-3g udisks2 dosfstools mtools \
 cpupower reflector samba git openssh tor virtualbox-guest-utils vlc transmission-gtk gvfs gvfs-smb \
-ttf-dejavu ttf-dejavu-nerd terminator veracrypt zip unzip xarchiver gimp inkscape pavucontrol make \
+ttf-dejavu ttf-dejavu-nerd terminator veracrypt zip unzip xarchiver gimp inkscape make \
 gcc go ruby perl tk python nodejs npm arch-wiki-docs arch-wiki-lite zeal qemu-full virt-manager \
 piper steam-native-runtime firefox libreoffice-fresh libreoffice-fresh-pt-br terminator galculator \
 leafpad calf smplayer gparted rofimoji easyeffects gnome-keyring seahorse
