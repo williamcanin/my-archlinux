@@ -130,11 +130,11 @@ Toda vez que o **Arch Linux** gera o "**vmlinuz-linux-lts**" e "**initramfs-linu
 gera no diretorio `/boot`, isso porque a configuração padrão é para esté diretório, mas com a EFI
 apontando para `/boot/efi`, tive que modificar essa configuração no arquivo
 `/etc/mkinitcpio.d/linux-lts.preset` e reinstalar o kernel. Na seção de
-**Instalando o bootloader systemd-boot** você irá ver informações sobre essa modificação.
+**Instalando o bootloader systemd-boot**, terá mais informações sobre essa modificação.
 
-* Sabendo disso, nesses guias NÃO VOU USAR duas partição de boot porque não uso mais dual-boot e
-nem compartilhamento do **systemd-boot** com outros sistemas, porém, eu vou relatado cada passo que
-precisa fazer caso seja uma instalação com `/boot` e `/boot/efi`.
+* Sabendo disso, nesses guias NÃO VOU USAR duas partição de boot separadas porque não uso mais
+dual-boot e nem compartilhamento do **systemd-boot** com outros sistemas, porém, eu vou relatar
+cada passo que precisa fazer em uma instalação com `/boot` e `/boot/efi` caso eu precise futuramente.
 
 ## Sistema
 
@@ -144,7 +144,7 @@ arquivo `ext4`.
 
 ## Home
 
-Tenho um HDD de **1 Terabyte** (*1Tb*) para minha `/home`, e criptografo a mesma usando o
+Tenho um SSD de **1 Terabyte** (*1Tb*) para minha `/home`, e criptografo a mesma usando o
 LUKS (*dm-crypt*), com o sistema de arquivos `ext4`.
 
 ## Tabela
