@@ -673,6 +673,13 @@ systemctl set-default multi-user.target
 ```
 </details></br>
 
+# Instalação de fontes
+
+```shell
+pacman -S --needed --noconfirm noto-fonts noto-fonts-emoji noto-fonts-cjk ttf-liberation \
+otf-font-awesome ttf-jetbrains-mono ttf-jetbrains-mono-nerd ttf-dejavu-nerd
+```
+
 # Instalação de drivers de áudio
 
 ```shell
