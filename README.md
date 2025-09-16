@@ -557,8 +557,6 @@ fallback_options="-S autodetect"
 EOF
 ```
 
-> **IMPORTANTE:** Se usar a EFI fora do `/boot`, em `/boot/efi`, deixar assim `ESP_DIR="efi/"`.
-
 > Dica: Caso eu queira um boot menos verboso e com splash, eu adiciono na opção `ALL_cmdline` os
 parâmentros: `quiet splash loglevel=3 systemd.show_status=auto rd.udev.log_level=3`. E depois
 instalo o pacote `plymouth`, e adiciono a flag `plymouth` nos HOOKS do `/etc/mkinitcpio.conf` depois
