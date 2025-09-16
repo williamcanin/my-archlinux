@@ -691,14 +691,25 @@ pacman -S --needed --noconfirm pipewire wireplumer pipewire-audio pipewire-pulse
 pipewire-jack lib32-pipewire lsp-plugins-lv2 mda.lv2 zam-plugins-lv2 zam-plugins-lv2 pavucontrol
 ```
 
-# Ambiente de trabalho (XFCE)
+# Ambiente de trabalho (i3)
 
-Meu ambiente principalmente atualmente é o XFCE:
+Atualmente uso **i3** com **Polybar**, e estes são os pacotes que uso com o mesmo para um ambiente
+agradável:
+
+```shell
+pacman -S --needed --noconfirm i3 i3lock i3status polybar pcmanfm picom rofi nitrogen gtk-chtheme\
+btop jq conky gsimplecal numlockx qt5ct qt6ct scrot dunst yazi xautolock imagemagick ranger lynx
+```
+
+<details>
+  <summary><strong>Ambiente de trabalho (XFCE)</strong></summary>
 
 ```shell
 pacman -S --needed --noconfirm xfce4 xfce4-goodies appmenu-gtk-module libdbusmenu-glib lightdm \
 lightdm-gtk-greeter
 ```
+
+</details></br>
 
 <details>
   <summary><strong>Instalação do ambiente de trabalho (GNOME)</strong></summary>
@@ -730,7 +741,7 @@ dosfstools mtools cpupower reflector samba git openssh tor virtualbox-guest-util
 transmission-gtk gvfs gvfs-smb ttf-dejavu ttf-dejavu-nerd terminator veracrypt zip unzip xarchiver \
 gimp inkscape make gcc go ruby perl tk python nodejs npm arch-wiki-docs arch-wiki-lite zeal \
 qemu-full virt-manager piper steam-native-runtime firefox libreoffice-fresh libreoffice-fresh-pt-br \
-terminator galculator leafpad calf smplayer gparted rofimoji easyeffects gnome-keyring seahorse
+terminator galculator leafpad calf smplayer gparted rofimoji easyeffects gnome-keyring seahorse mpv
 ```
 
 # Habilitando serviços
