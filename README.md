@@ -719,8 +719,8 @@ Minha realação com GNOME é entre amor e ódio. Instalo mas deixo com um ambie
 **Mínimo:**
 
 ```shell
-pacman -S --needed --noconfirm gnome-shell gnome-control-center gnome-terminal nautilus \
-gnome-browser-connector gnome-shell-extensions gnome-tweaks gdm
+pacman -S --needed --noconfirm gnome-shell gnome-control-center gnome-terminal nautilus gdm \
+gnome-browser-connector gnome-shell-extensions gnome-tweaks
 ```
 
 **Completo:**
@@ -881,7 +881,7 @@ groupadd sudo -U $USERNAME_TEMP;
 passwd $USERNAME_TEMP;
 ```
 
-# Idioma e localidade
+# Idioma e região
 
 Esses comandos são necessário para configurar o teclado e idioma do sistema, onde cada linha é um
 comando:
@@ -899,3 +899,45 @@ echo "archlinux" | tee /etc/hostname;
 printf "127.0.0.1        archlinux\n" >> /etc/hosts;
 echo KEYMAP=br-abnt2 | tee /etc/vconsole.conf;
 ```
+
+# Security Boot (Opcional)
+
+**(1)** - Primeiro, reinciar a máquiona, deixar o **security boot=disabled** e redefinir/remover todas chaves.
+
+**(2)** - Instalar o pacote `sbctl`:
+
+```shell
+pacman -S sbctl
+```
+
+**(3)** - Aplicar os seguintes comandos:
+
+```shell
+sbctl create-keys
+sbctl sign -s -o /usr/lib/systemd/boot/efi/systemd-bootx64.efi.signed /usr/lib/systemd/boot/efi/systemd-bootx64.efi
+sbctl sign -s /boot/EFI/BOOT/BOOTX64.EFI
+sbctl sign -s /boot/EFI/Linux/arch-linux-lts.efi
+sbctl sign -s /boot/EFI/Linux/arch-linux-lts-fallback.efi
+sbctl verify
+```
+
+**(4)** - Reiniciar a máquina com o comando:
+
+```shell
+systemctl reboot --firmware-setup
+```
+
+**(5)** - Quando estiver dentro da **BIOS**, habilitar o **security boot** e deixar o modo de
+chave em **Custom** e inicie a máquina novamente.
+
+**(6)** - Após estar dentro do **Arch Linux** novamente, executar o comando abaixo:
+
+```shell
+sbctl enroll-keys --microsoft
+```
+
+Isso faz com que crie as chaves na EFI, e a opção `microsoft` também habilitar para EFI da Microsoft,
+caso tenho dual-boot com **Windows**.
+
+
+
