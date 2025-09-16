@@ -510,7 +510,7 @@ bootctl --path=/boot/efi install
 ```shell
 ESP_DIR="";
 cat << EOF > /boot/${ESP_DIR}loader/loader.conf
-default arch.conf
+default arch-linux-lts.efi
 timeout 3
 console-mode max
 editor no
@@ -521,9 +521,11 @@ EOF
 Se instalou o sistema com a partição de boot separada, um em `/boot` e outra `/boot/efi`, então a
 variável `ESP_DIR` DEVE ser assim: `ESP_DIR="efi/"`. Caso contrário deixe vazio.
 
+> Nota: Na opção `default`, se usar UKI, colocar o nome do UKI completo, por exemplo: `arch-linux-lts.efi`. Se usar modo tradicional, usar o nome do arquivo, por exemplo: `arch.conf`.
+
 ## Usando UKI (Unified Kernel Image)
 
-Atualmente estou usando `systemd-boot` + `UKI` (Unified Kernel Image) ❤️, e esses são os passos que
+Atualmente estou usando `systemd-boot` + `UKI` (Unified Kernel Image), e esses são os passos que
 faço para instalar.
 
 **(1)** - Crio um backup do "preset" primeiro:
@@ -562,6 +564,7 @@ parâmentros: `quiet splash loglevel=3 systemd.show_status=auto rd.udev.log_leve
 instalo o pacote `plymouth`, e adiciono a flag `plymouth` nos HOOKS do `/etc/mkinitcpio.conf` depois
 de `keymap`.
 
+<!--
 **(3)** - Agora crio as entradas do `systemd-boot` padrão:
 
 ```shell
@@ -578,9 +581,9 @@ cat << EOF > /boot/${ESP_DIR}loader/entries/arch-fallback.conf
 title   Arch Linux LTS (Fallback)
 efi     /EFI/Linux/arch-linux-lts-fallback.efi
 EOF
-```
+``` -->
 
-**(5)** - Reinstalo o kernel:
+**(3)** - Reinstalo o kernel:
 
 ```shell
 pacman -S --noconfirm linux-lts
@@ -588,12 +591,12 @@ pacman -S --noconfirm linux-lts
 
 
 <details>
-  <summary><strong>Usando Padrão</strong></summary>
+  <summary><strong>Usando modo tradicional</strong></summary>
 
 Aqui a configuração do systemd-boot muda, em vez de usar UKI, usa os arquivos
 **vmlinuz-linux-lts**, **initramfs-linux-lts.img** e **intel-ucode.img** da iniciar o boot.
 
-**(1)** - Primeiro remover qualquer imagem `.efi` gerada:
+**(1)** - Primeiro removo qualquer imagem `.efi` gerada:
 
 ```shell
 rm -f /boot/${ESP_DIR}EFI/Linux/arch-linux-lts.efi /boot/${ESP_DIR}EFI/Linux/arch-linux-lts-fallback.efi
@@ -622,11 +625,14 @@ initrd /initramfs-linux-ltsfallback.img
 options root=UUID=$(blkid -s UUID -o value /dev/mapper/linux-arch) rw nvidia_drm.modeset=1 video=1920x1080@75
 EOF
 ```
+
+> Nota: Nas entradas de boot, em `options`, vale a mesma configuração do UKI.
+
 </details></br>
 
 # Instalação de drivers gráficos
 
-Agora vamos de fatos ir para ambiente gráfico. Então começo a instalar alguns drivers essenciais e
+Agora vamos de fato ir para ambiente gráfico. Então começo a instalar alguns drivers essenciais e
 API, como **Vulkan**, **OpenGL**, etc:
 
 ```shell
@@ -689,7 +695,7 @@ pipewire-jack lib32-pipewire lsp-plugins-lv2 mda.lv2 zam-plugins-lv2 zam-plugins
 
 # Ambiente de trabalho (XFCE)
 
-Meu ambiente principalmente atualmente é o XFCE ❤️, leve e funcional:
+Meu ambiente principalmente atualmente é o XFCE:
 
 ```shell
 pacman -S --needed --noconfirm xfce4 xfce4-goodies appmenu-gtk-module libdbusmenu-glib lightdm \
@@ -721,12 +727,12 @@ gnome-browser-connector gnome-tweaks gdm
 Algumas aplicações básicas que uso:
 
 ```shell
-pacman -S --needed --noconfirm pacman-contrib dkms xdg-user-dirs ntfs-3g udisks2 dosfstools mtools \
-cpupower reflector samba git openssh tor virtualbox-guest-utils vlc transmission-gtk gvfs gvfs-smb \
-ttf-dejavu ttf-dejavu-nerd terminator veracrypt zip unzip xarchiver gimp inkscape make \
-gcc go ruby perl tk python nodejs npm arch-wiki-docs arch-wiki-lite zeal qemu-full virt-manager \
-piper steam-native-runtime firefox libreoffice-fresh libreoffice-fresh-pt-br terminator galculator \
-leafpad calf smplayer gparted rofimoji easyeffects gnome-keyring seahorse
+pacman -S --needed --noconfirm pacman-contrib util-linux dkms xdg-user-dirs ntfs-3g udisks2 \
+dosfstools mtools cpupower reflector samba git openssh tor virtualbox-guest-utils vlc \
+transmission-gtk gvfs gvfs-smb ttf-dejavu ttf-dejavu-nerd terminator veracrypt zip unzip xarchiver \
+gimp inkscape make gcc go ruby perl tk python nodejs npm arch-wiki-docs arch-wiki-lite zeal \
+qemu-full virt-manager piper steam-native-runtime firefox libreoffice-fresh libreoffice-fresh-pt-br \
+terminator galculator leafpad calf smplayer gparted rofimoji easyeffects gnome-keyring seahorse
 ```
 
 # Habilitando serviços
@@ -780,8 +786,7 @@ fs-type = swap
 EOF
 ```
 
-> Nota: Caso eu queira um perfil mais agressivo, para jogar por exemplo, que necessite de **zram**,
-então eu uso este abaixo:
+> Nota: Caso eu queira um perfil mais agressivo, para jogar por exemplo, que necessite de **zram**, então eu uso este abaixo:
 
 <details>
   <summary><strong>ZRAM: Perfil Agressivo </strong></summary>
@@ -803,6 +808,50 @@ EOF
 systemctl daemon-reload;
 systemctl enable --now systemd-zram-setup@zram0.service
 ```
+
+<details>
+  <summary><strong>Swap (opcional) </strong></summary>
+
+Caso eu prefiro usar **Swap** em arquivo em vez de **zram**, esses são os passos:
+
+**(1)** - Criando arquivo para swap:
+
+```shell
+fallocate -l 8G /swapfile
+# or: dd if=/dev/zero of=/swapfile bs=1M count=4096 status=progress
+```
+
+**(2)** - Dando permissões:
+
+```shell
+chmod 600 /swapfile
+chown root:root /swapfile
+```
+
+**(3)** - Ativando:
+
+```shell
+mkswap /swapfile
+swapon /swapfile
+```
+
+**(4)** - Ativando swap no boot:
+
+```shell
+cat << EOF >> /etc/fstab
+### Swap
+/swapfile none swap defaults 0 0
+EOF
+```
+
+**(5)** - Configurando swappiness:
+
+```shell
+echo 'vm.swappiness=10' | tee -a /etc/sysctl.d/99-swap.conf
+```
+
+> Nota: swappiness recomendado: 10 para SSD, 60 para HDD.
+</details></br>
 
 # Adicionando um usuário
 
