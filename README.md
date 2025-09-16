@@ -587,7 +587,6 @@ EOF
 pacman -S --noconfirm linux-lts
 ```
 
-
 <details>
   <summary><strong>Usando modo tradicional</strong></summary>
 
@@ -625,6 +624,28 @@ EOF
 ```
 
 > Nota: Nas entradas de boot, em `options`, vale a mesma configuração do UKI.
+
+</details></br>
+
+<details>
+  <summary><strong>Reinstalando o bootloader (Manutenção)</strong></summary>
+
+Caso eu precise reinstalar o **systemd-boot** após um update ou reinstalação de outro
+sistema operacional, sigo as etapas abaixo após entrar na ISO do **Arch Linux**:
+
+```shell
+mount /dev/mapper/linux-arch /mnt;
+mount --mkdir /dev/sda1 /mnt/boot;
+mount --mkdir /dev/mapper/home /mnt/home;
+for dir in proc sys dev run; do mount --rbind /$dir /mnt/$dir; done;
+arch-chroot /mnt;
+pacman -S --noconfirm linux-lts linux-lts-headers;
+mkinitcpio -P;
+bootctl --path=/boot install;
+```
+
+> Nota 1: Então Repito os passos de: **Instalando o bootloader**.
+> Nota 2: Lembrand- que, se usar `/boot` e `/boot/efi`, montar ambos e usar o `bootctl` em `/boot/efi`.
 
 </details></br>
 
