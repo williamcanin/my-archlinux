@@ -902,15 +902,13 @@ echo KEYMAP=br-abnt2 | tee /etc/vconsole.conf;
 
 # Security Boot (Opcional)
 
-**(1)** - Primeiro, reinciar a máquiona, deixar o **security boot=disabled** e redefinir/remover todas chaves.
-
-**(2)** - Instalar o pacote `sbctl`:
+**(1)** - Instalar o pacote `sbctl`:
 
 ```shell
 pacman -S sbctl
 ```
 
-**(3)** - Aplicar os seguintes comandos:
+**(2)** - Criar as chaves e aplicar as assinaturas:
 
 ```shell
 sbctl create-keys
@@ -921,14 +919,15 @@ sbctl sign -s /boot/EFI/Linux/arch-linux-lts-fallback.efi
 sbctl verify
 ```
 
-**(4)** - Reiniciar a máquina com o comando:
+**(4)** - Reiniciar a máquina com o comando abaixo para entrar automaticamente na **BIOS**:
 
 ```shell
 systemctl reboot --firmware-setup
 ```
 
-**(5)** - Quando estiver dentro da **BIOS**, habilitar o **security boot** e deixar o modo de
-chave em **Custom** e inicie a máquina novamente.
+**(5)** - Quando estiver dentro da **BIOS**, ir na aba Boot > **Security Boot** deixando
+desabilitado e no modo **Custom**. Em **Key Management**, apagar TODAS as chaves e RESTAURAR para o
+**Setup Mode**, feito isso salvar e iniciar o **Arch Linux** novamente.
 
 **(6)** - Após estar dentro do **Arch Linux** novamente, executar o comando abaixo:
 
@@ -936,8 +935,12 @@ chave em **Custom** e inicie a máquina novamente.
 sbctl enroll-keys --microsoft
 ```
 
-Isso faz com que crie as chaves na EFI, e a opção `microsoft` também habilitar para EFI da Microsoft,
-caso tenho dual-boot com **Windows**.
+> Nota: Isso faz com que crie as chaves de assinatura na **EFI**, e a opção `--microsoft` é para
+habilitar assinatura no **Windows** também, caso tenho dual-boot com o mesmo.
+
+**(7)** - Reinicie a máquina novamente para entrar na **BIOS** igual o passo **(4)**. Agora, dentro
+da **BIOS**,  habilite o **Security Boot** e salve. Quando reiniciar o **Arch Linux** já estará em
+modo **Security Boot**.
 
 
 
