@@ -963,5 +963,41 @@ habilitar assinatura no **Windows** também, caso tenho dual-boot com o mesmo.
 da **BIOS**,  habilite o **Security Boot** e salve. Quando reiniciar o **Arch Linux** já estará em
 modo **Security Boot**.
 
+# Pós Instalação
 
+Após estar dentro do **Arch Linux** com meu usuário, outras configurações que faço são:
 
+## Instalando YAY
+
+**(1)** - Instalar um gerenciador de pacotes para o **AUR**, no caso, o `yay`:
+
+```shell
+git clone https://aur.archlinux.org/yay.git;
+cd yay && makepkg -si PKGBUILD
+```
+
+**(2)** - Depois do `yay` instalado, instalo outros pacotes/programas essenciais que uso:
+
+```shell
+yay -S --noconfirm i3-volume spotify visual-studio-code-bin brave-bin google-chrome secure-delete \
+smem
+```
+
+## Configurando meu shell
+
+Uso o **ZSH** com [Oh-My-ZSH](https://ohmyz.sh/), plugins e [Starship](https://startship.rs), e faço assim:
+
+```shell
+sudo pacman -S --noconfirm starship;
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)";
+git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions;
+git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting;
+new_plugins=" zsh-autosuggestions zsh-syntax-highlighting";
+current_plugins=$(grep '^plugins=' "$HOME/.zshrc" | sed 's/^plugins=(//; s/)//');
+new_plugins_line="plugins=(${current_plugins}${new_plugins})";
+sed -i "s|^plugins=.*|${new_plugins_line}|" "$HOME/.zshrc";
+echo "eval \"\$(starship init zsh)\"" > "${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/themes/starship.zsh-theme";
+sed -i 's/^ZSH_THEME=".*"/ZSH_THEME="starship"/' "$HOME/.zshrc";
+```
+
+> Nota: Geralmente eu apenas instalo o [Oh-My-ZSH](https://ohmyz.sh/), plugins e [Starship](https://startship.rs), e as configurações do `~/.zshrc` e resgato do meu **dotfiles**, usando o [DotCtrl](https://github.com/snakypy/dotctrl), um gerenciador de dotfiles criado por mim mesmo 😆.
