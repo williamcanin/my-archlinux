@@ -154,7 +154,7 @@ Tabela com a partição de boot separada em duas deve ficar assim:
 | Dispositivo | Tamanho |    Tipo             |  Local    |
 |-------------|---------|---------------------|-----------|
 | /dev/sda1   | 2G      | Linux filesystems   | /boot     |
-| /dev/sda2   | 2G      | Sistema EFI         | /boot/efi |
+| /dev/sda2   | 2G      | EFI System          | /boot/efi |
 | /dev/sda3   | 120G    | Linux LVM           |           |
 | /dev/sdb1   | 1T      | Linux filesystems   | /home     |
 
@@ -191,7 +191,7 @@ terceiro comando, crio um volume lógico especificando o grupo (`linux`).
 **(1)** - Criptografando a unidade `/dev/sdb1`:
 
 ```shell
-cryptsetup -y -v luksFormat /dev/sdb1;
+cryptsetup -y -v luksFormat /dev/sdb1
 ```
 
 > IMPORTANTE!!! Se você já tem a unidade `/dev/mapper/home` criptografada com seus arquivos não tem
@@ -200,7 +200,7 @@ necessidade deste passo **1** senão irá perder os arquivos. PULE para o passo 
 **(2)** - Criando/abrindo a unidade criptografada:
 
 ```shell
-cryptsetup open /dev/sdb1 home;
+cryptsetup open /dev/sdb1 home
 ```
 
 # Formatação
@@ -718,7 +718,7 @@ Atualmente uso **i3** com **Polybar**, e estes são os pacotes que uso com o mes
 agradável:
 
 ```shell
-pacman -S --needed --noconfirm i3 i3lock i3status polybar pcmanfm picom rofi nitrogen gtk-chtheme\
+pacman -S --needed --noconfirm i3 i3lock i3status polybar pcmanfm picom rofi nitrogen gtk-chtheme \
 btop jq conky gsimplecal numlockx qt5ct qt6ct scrot dunst yazi xautolock imagemagick ranger lynx
 ```
 
@@ -926,7 +926,7 @@ echo KEYMAP=br-abnt2 | tee /etc/vconsole.conf;
 **(1)** - Instalar o pacote `sbctl`:
 
 ```shell
-pacman -S sbctl
+pacman -S --noconfirm sbctl
 ```
 
 **(2)** - Criar as chaves e aplicar as assinaturas:
