@@ -1001,3 +1001,47 @@ sed -i 's/^ZSH_THEME=".*"/ZSH_THEME="starship"/' "$HOME/.zshrc";
 ```
 
 > Nota: Geralmente eu apenas instalo o [Oh-My-ZSH](https://ohmyz.sh/), plugins e [Starship](https://startship.rs), e as configurações do `~/.zshrc` e resgato do meu **dotfiles**, usando o [DotCtrl](https://github.com/snakypy/dotctrl), um gerenciador de dotfiles criado por mim mesmo 😆.
+
+
+## Login automático
+
+Como eu uso criptografia dos meus dados, não acho interessante ter que ficar colocando senha para
+entrar no DE após descriptografar minha máquina em boot, então uso **login automático**  através do
+**TTY**. Não uso gerenciador de login, como o **GDM**, **LightDM**, etc.
+
+Sabendo disso, os passos são:
+
+**(1)** - Crio um serviço no **systemd** para pular o prompt:
+
+```shell
+sudo mkdir -p /etc/systemd/system/getty@tty1.service.d;
+sudo cat << EOF > /etc/systemd/system/getty@tty1.service.d/skip-prompt.conf
+[Service]
+ExecStart=
+ExecStart=-/usr/bin/agetty --skip-login --nonewline --noissue --autologin <USER> --noclear %I \$TERM
+EOF
+```
+
+> IMPORTANTE: Onde esta `<USER>` coloco o nome do meu usuário.
+
+**(2)** - Crio um novo arquivo `.xinitrc` (fazendo backup do mesmo caso exista) adicionando o `i3`
+para ser executado:
+
+```shell
+[ -f "$HOME/.xinitrc" ] && mv $HOME/.xinitrc $HOME/.xinitrc.bak;
+cat << EOF > $HOME/.xinitrc
+exec i3
+EOF
+```
+
+**(3)** - Crio um novo arquivo `.zprofile` (fazendo backup do mesmo caso exista) e uma condição
+apenas para logar automaticamente quando estiver no **tty1**:
+
+```shell
+[ -f "$HOME/.zprofile" ] && mv $HOME/.zprofile $HOME/.zprofile.bak;
+cat << EOF > $HOME/.zprofile
+if [ -z "\$DISPLAY" ] && [ "\$XDG_VTNR" = 1 ]; then
+  exec startx &>/dev/null
+fi
+EOF
+```
