@@ -972,8 +972,8 @@ sbctl verify
 <details>
   <summary><strong>Assinando EFI Windows</strong></summary>
 
-A EFI do Windows existe muitos arquivo que devem ser assinados, por isso, faço da seguinte maneira
-retirado do própria [Wiki do Arch Linux](https://wiki.archlinux.org/title/Unified_Extensible_Firmware_Interface/Secure_Boot#Assisted_process_with_sbctl):
+A EFI do Windows existem muitos arquivos que devem ser assinados, por isso, faço da seguinte maneira
+retirado da própria [Wiki do Arch Linux](https://wiki.archlinux.org/title/Unified_Extensible_Firmware_Interface/Secure_Boot#Assisted_process_with_sbctl):
 
 
 ```shell
