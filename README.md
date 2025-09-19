@@ -450,12 +450,12 @@ parâmetro **-a** significa **append**, adicionar, se emitir ele, irá sobrescre
 sed -i "s|^MODULES=.*|MODULES=(usbhid xhci_hcd ehci_hcd)|g" /etc/mkinitcpio.conf
 ```
 
-O driver `usbhid` é esencial para reconhecer dispositivos como teclados e mouses que se conectam
+O driver `usbhid` é essencial para reconhecer dispositivos como teclados e mouses que se conectam
 via USB. Já o `xhci_hcd` e `ehci_hcd` são responsáveis por fazer a ponte entre o hardware e os
 dispositivos USB.
 
 > Bug: Como eu tenho a partição `/home` criptografada que necessita colocar a senha durante o boot,
-eu não acrescento os módulos da minha GPU (NVIDIA) para não dar "*flicker*" na tela durante o boot
+eu não acrescento os módulos da minha GPU (NVIDIA) para não dar "*flicker*" na tela durante o boot,
 ocasionando quebra de linha do cursor no passphrase da `/home`.
 
 **(2)** - Nos HOOKS adiciono a opção de criptografia e **LVM**. Então faço assim:
@@ -487,7 +487,7 @@ pacman -S --noconfirm efibootmgr intel-ucode
 ```
 
 > Nota: O `efibootmgr` é um "gerenciador" de bootloader EFI, e o `intel-ucode` é um microcódigo de
-segurança para CPU Intel. Caso eu tenha AMD como CPU, instalo o `amd-code`.
+segurança para CPU Intel. Na AMD como CPU, instalo o `amd-code`.
 
 **(2)** - Depois faço de fato a instalação o `systemd-boot` como bootloader:
 
@@ -498,7 +498,8 @@ bootctl --path=/boot install
 <details>
   <summary><strong>Com partição de boot separada</strong></summary>
 
-Se instalou o sistema com a partição de boot separada, então a instalação é assim:
+Se eu instalei o sistema com a partição de boot separada, então minha instalação do bootloader
+fica assim:
 
 ```shell
 bootctl --path=/boot/efi install
@@ -521,14 +522,16 @@ EOF
 Se instalou o sistema com a partição de boot separada, um em `/boot` e outra `/boot/efi`, então a
 variável `ESP_DIR` DEVE ser assim: `ESP_DIR="efi/"`. Caso contrário deixe vazio.
 
-> Nota: Na opção `default`, se usar UKI, colocar o nome do UKI completo, por exemplo: `arch-linux-lts.efi`. Se usar modo tradicional, usar o nome do arquivo, por exemplo: `arch.conf`.
+> Nota: Na opção `default`, se usar UKI, colocar o nome do UKI completo, por exemplo:
+`arch-linux-lts.efi`. Se usar modo tradicional, usar o nome do arquivo presente no diretório
+`entries` , por exemplo: `arch.conf`.
 
 ## Usando UKI (Unified Kernel Image)
 
 Atualmente estou usando `systemd-boot` + `UKI` (Unified Kernel Image), e esses são os passos que
 faço para instalar.
 
-**(1)** - Crio um backup do "preset" primeiro:
+**(1)** - Crio um backup do "*preset*" primeiro:
 
 ```shell
 cp /etc/mkinitcpio.d/linux-lts.preset /etc/mkinitcpio.d/linux-lts.preset.backup
@@ -590,13 +593,13 @@ pacman -S --noconfirm linux-lts
 <details>
   <summary><strong>Usando modo tradicional (Opcional)</strong></summary>
 
-Aqui a configuração do systemd-boot muda, em vez de usar UKI, usa os arquivos
-**vmlinuz-linux-lts**, **initramfs-linux-lts.img** e **intel-ucode.img** da iniciar o boot.
+Aqui a configuração do **systemd-boot** muda, em vez de usar UKI, uso os arquivos
+**vmlinuz-linux-lts**, **initramfs-linux-lts.img** e **intel-ucode.img** para iniciar o boot.
 
 **(1)** - Primeiro removo qualquer imagem `.efi` gerada:
 
 ```shell
-rm -f /boot/${ESP_DIR}EFI/Linux/arch-linux-lts.efi /boot/${ESP_DIR}EFI/Linux/arch-linux-lts-fallback.efi
+rm -f /boot/${ESP_DIR}EFI/Linux/arch-linux-lts*.efi
 ```
 
 **(2)** - Depois eu crio a entrada padrão assim:
@@ -623,7 +626,7 @@ options root=UUID=$(blkid -s UUID -o value /dev/mapper/linux-arch) rw nvidia_drm
 EOF
 ```
 
-> Nota: Nas entradas de boot, em `options`, vale a mesma configuração do UKI.
+> Nota: Nas entradas de boot, em `options`, vale a mesma configuração do `ALL_cmdline` do **UKI**.
 
 </details></br>
 
@@ -631,7 +634,7 @@ EOF
   <summary><strong>Adicionando EFI do Windows (Opcional)</strong></summary>
 
 Quando quero fazer um dual-boot com **Windows** ou até mesmo usar o Windows instalado em outra
-SSD/HDD, e  adicionar o mesmo no **systemd-boot**, eu faço os passos abaixo:
+SSD/HDD, e adicionar o mesmo no **systemd-boot**, eu faço os passos abaixo:
 
 **(1)** - Acho a partição de bootloader do Windows, por exemplo, **sdc1** e monto a mesma:
 
@@ -674,13 +677,13 @@ bootctl --path=/boot install;
 ```
 
 > Nota 1: Então Repito os passos de: **Instalando o bootloader**.
-> Nota 2: Lembrand- que, se usar `/boot` e `/boot/efi`, montar ambos e usar o `bootctl` em `/boot/efi`.
+> Nota 2: Lembrando que, se usar `/boot` e `/boot/efi`, montar ambos e usar o `bootctl` em `/boot/efi`.
 
 </details></br>
 
 # Instalação de drivers gráficos
 
-Agora vamos de fato ir para ambiente gráfico. Então começo a instalar alguns drivers essenciais e
+Agora vou de fato para o ambiente gráfico. Então começo a instalar alguns drivers essenciais e
 API, como **Vulkan**, **OpenGL**, etc:
 
 ```shell
@@ -690,7 +693,8 @@ lib32-vulkan-icd-loader vulkan-tools
 
 **Intel:**
 
-Como uso [Intel](https://www.intel.com.br/content/www/br/pt/products/details/processors/core.html), então também instalo esses drivers para GPU integrada:
+Como uso [Intel](https://www.intel.com.br/content/www/br/pt/products/details/processors/core.html),
+então também instalo esses drivers para GPU integrada:
 
 ```shell
 pacman -S --needed --noconfirm mesa-vulkan-intel vulkan-intel linux-firmware-intel
@@ -699,7 +703,7 @@ pacman -S --needed --noconfirm mesa-vulkan-intel vulkan-intel linux-firmware-int
 <details>
   <summary><strong>AMD</strong></summary>
 
-Não estou usando AMD, mas vou deixar os drivers necessários caso eu use futuramente:
+Não estou usando **AMD** no momento, mas vou deixar os drivers necessários caso eu use futuramente:
 
 ```shell
 pacman -S --needed --noconfirm mesa-vulkan-radeon vulkan-radeon linux-firmware-radeon
@@ -708,7 +712,7 @@ pacman -S --needed --noconfirm mesa-vulkan-radeon vulkan-radeon linux-firmware-r
 
 **NVIDIA (Nouveau)**
 
-Sempe bom ter os drivers da NVIDIA open-source caso a NVIDIA faça alguma nhaca de incompatibilidade:
+Sempe bom ter os drivers da NVIDIA open-source caso a NVIDIA faça alguma "nhaca" de incompatibilidade:
 
 ```shell
 pacman -S --noconfirm  xf86-video-nouveau vulkan-nouveau
@@ -717,7 +721,7 @@ pacman -S --noconfirm  xf86-video-nouveau vulkan-nouveau
 <details>
   <summary><strong>NVIDIA (proprietary) 🙄</strong></summary>
 
-Como já relatei acima, não uso o driver proprietário da NVIDIA do repo do **Arch Linux** por
+Como já relatei acima, não uso o driver proprietário da **NVIDIA** do repo do **Arch Linux** por
 algumas incompatibilidades que tive na última versão 😡, mas mesmo assim vou deixar os pacotes
 essenciais que se deve instalar:
 
@@ -743,8 +747,7 @@ pipewire-jack lib32-pipewire lsp-plugins-lv2 mda.lv2 zam-plugins-lv2 zam-plugins
 
 # Ambiente de trabalho (i3)
 
-Atualmente uso **i3** com **Polybar**, e estes são os pacotes que uso com o mesmo para um ambiente
-agradável:
+Atualmente uso **i3** + **Polybar**, e esses são os pacotes que uso para um ambiente agradável:
 
 ```shell
 pacman -S --needed --noconfirm i3 i3lock i3status polybar pcmanfm picom rofi nitrogen gtk-chtheme \
@@ -764,7 +767,7 @@ lightdm-gtk-greeter
 <details>
   <summary><strong>Instalação do ambiente de trabalho (GNOME)</strong></summary>
 
-Minha realação com GNOME é entre amor e ódio. Instalo mas deixo com um ambiente de fallback:
+Minha relação com **GNOME** é entre amor e ódio. Instalo mas deixo com um ambiente de fallback:
 
 **Mínimo:**
 
@@ -796,7 +799,7 @@ terminator galculator leafpad calf smplayer gparted rofimoji easyeffects gnome-k
 
 # Habilitando serviços
 
-Neste momento habilito alguns servições para iniciar durante o boot:
+Neste momento habilito alguns serviços para iniciar durante o boot:
 
 ```shell
 systemctl enable iptables.service smb.service nmb.service tor.service
@@ -805,7 +808,7 @@ systemctl enable iptables.service smb.service nmb.service tor.service
 # Complementando o /etc/fstab
 
 Meu computador não tem leitor de disquete e CD/DVD (e quem tem?), mas mesmo asim eu mantenho a
-configuração no `/etc/fstab`, e também já deixa comentado para uma partição **Windows**, caso eu
+configuração no `/etc/fstab`, e também já deixo comentado para uma partição **Windows**, caso eu
 tenha um dia. Para essas configurações, eu faço os comandos:
 
 ```shell
@@ -845,7 +848,8 @@ fs-type = swap
 EOF
 ```
 
-> Nota: Caso eu queira um perfil mais agressivo, para jogar por exemplo, que necessite de **zram**, então eu uso este abaixo:
+> Nota: Caso eu queira um perfil mais agressivo, para jogar por exemplo, que necessite de **zram**,
+então eu uso este perfil abaixo:
 
 <details>
   <summary><strong>ZRAM: Perfil Agressivo </strong></summary>
@@ -877,7 +881,7 @@ Caso eu prefiro usar **Swap** em arquivo em vez de **zram**, esses são os passo
 
 ```shell
 fallocate -l 8G /swapfile
-# or: dd if=/dev/zero of=/swapfile bs=1M count=4096 status=progress
+# ou: dd if=/dev/zero of=/swapfile bs=1M count=4096 status=progress
 ```
 
 **(2)** - Dando permissões:
@@ -903,25 +907,25 @@ cat << EOF >> /etc/fstab
 EOF
 ```
 
-**(5)** - Configurando swappiness:
+**(5)** - Configurando *swappiness*:
 
 ```shell
 echo 'vm.swappiness=10' | tee -a /etc/sysctl.d/99-swap.conf
 ```
 
-> Nota: swappiness recomendado: 10 para SSD, 60 para HDD.
+> Nota: O swappiness recomendado é: 10 para SSD, 60 para HDD.
 </details></br>
 
 # Adicionando um usuário
 
 **1** - Antes, vou liberar o grupo `sudo` no arquivo `/etc/sudoers` para meu usuário pertencer a
-esse grupo e ter privilégios de sudo:
+esse grupo e eu ter privilégios de *sudo*:
 
 ```shell
 sed -i "s|# %sudo ALL=(ALL:ALL) ALL|%sudo ALL=(ALL:ALL) ALL|g" /etc/sudoers
 ```
 
-**2** - Agora começo a criação do grupo do meu usuário, e a criação do meu usuário em si:
+**2** - Agora começo a criação do grupo do meu usuário e a criação do meu usuário em si:
 
 ```shell
 USERNAME_TEMP="will";
@@ -986,34 +990,34 @@ sbctl verify | sed 's/✗ /sbctl sign -s /e'
 
 </details></br>
 
-**(4)** - Reiniciar a máquina com o comando abaixo para entrar automaticamente na **BIOS**:
+**(4)** - Reinicio a máquina com o comando abaixo para entrar automaticamente na **BIOS**:
 
 ```shell
 systemctl reboot --firmware-setup
 ```
 
-**(5)** - Quando estiver dentro da **BIOS**, ir na aba Boot > **Security Boot** deixando
-desabilitado e no modo **Custom**. Em **Key Management**, apagar TODAS as chaves e RESTAURAR para o
-**Setup Mode**, feito isso salvar e iniciar o **Arch Linux** novamente.
+**(5)** - Quando estou dentro da **BIOS**, vou na aba **Boot** > **Security Boot** deixando
+desabilitado, e no modo **Custom**. Em **Key Management**, apago TODAS as chaves e RESTAURO para o
+**Setup Mode**, feito isso, salvo e inicio o **Arch Linux** novamente.
 
-**(6)** - Após estar dentro do **Arch Linux** novamente, executar o comando abaixo:
+**(6)** - Após estar dentro do **Arch Linux** novamente, executo o comando abaixo:
 
 ```shell
 sbctl enroll-keys --microsoft
 ```
 
 > Nota: Isso faz com que crie as chaves de assinatura na **EFI**, e a opção `--microsoft` é para
-habilitar assinatura no **Windows** também, caso tenho dual-boot com o mesmo.
+habilitar assinatura no **Windows** também (caso eu tenha dual-boot com Windows).
 
-**(7)** - Reinicie a máquina novamente para entrar na **BIOS** igual o passo **(4)**. Agora, dentro
-da **BIOS**,  habilite o **Security Boot** e salve. Quando reiniciar o **Arch Linux** já estará em
-modo **Security Boot**.
+**(7)** - Reinicio a máquina novamente para entrar na **BIOS** igual o passo **(4)**. Agora, dentro
+da **BIOS**,  habilito o **Security Boot** e salvo. Quando reinicio o **Arch Linux**, minha máquina
+já estará em modo **Security Boot**.
 
 # Pós Instalação
 
 Após estar dentro do **Arch Linux** com meu usuário, outras configurações que faço são:
 
-## Instalando YAY
+## Instalando yay
 
 **(1)** - Instalar um gerenciador de pacotes para o **AUR**, no caso, o `yay`:
 
@@ -1022,7 +1026,7 @@ git clone https://aur.archlinux.org/yay.git;
 cd yay && makepkg -si PKGBUILD
 ```
 
-**(2)** - Depois do `yay` instalado, instalo outros pacotes/programas essenciais que uso:
+**(2)** - Depois do `yay` instalado, instalo outros pacotes/programas essenciais do **AUR**:
 
 ```shell
 yay -S --noconfirm i3-volume spotify visual-studio-code-bin brave-bin google-chrome secure-delete \
@@ -1031,7 +1035,8 @@ smem
 
 ## Configurando meu shell
 
-Uso o **ZSH** com [Oh-My-ZSH](https://ohmyz.sh/), plugins e [Starship](https://startship.rs), e faço assim:
+Uso o **ZSH** com [Oh-My-ZSH](https://ohmyz.sh/), plugins e [Starship](https://startship.rs), e faço
+assim:
 
 ```shell
 sudo pacman -S --noconfirm starship;
@@ -1046,14 +1051,17 @@ echo "eval \"\$(starship init zsh)\"" > "${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/them
 sed -i 's/^ZSH_THEME=".*"/ZSH_THEME="starship"/' "$HOME/.zshrc";
 ```
 
-> Nota: Geralmente eu apenas instalo o [Oh-My-ZSH](https://ohmyz.sh/), plugins e [Starship](https://startship.rs), e as configurações do `~/.zshrc` e resgato do meu **dotfiles**, usando o [DotCtrl](https://github.com/snakypy/dotctrl), um gerenciador de dotfiles criado por mim mesmo 😆.
+> Nota: Geralmente eu apenas instalo o [Oh-My-ZSH](https://ohmyz.sh/), plugins e [Starship](https://startship.rs),
+e as configurações do `~/.zshrc` e resgato do meu **dotfiles**, usando o
+[DotCtrl](https://github.com/snakypy/dotctrl), um gerenciador de dotfiles criado por mim mesmo 😆.
 
 
 ## Login automático
 
 Como eu uso criptografia dos meus dados, não acho interessante ter que ficar colocando senha para
-entrar no DE após descriptografar minha máquina em boot, então uso **login automático**  através do
-**TTY**. Não uso gerenciador de login, como o **GDM**, **LightDM**, etc.
+entrar no **ambiente gráfico** após descriptografar minha máquina em boot, então uso
+**login automático** através do **TTY**. Não uso gerenciador de login, como o **GDM**, **LightDM**,
+etc.
 
 Sabendo disso, os passos são:
 
@@ -1070,7 +1078,7 @@ EOF
 
 > IMPORTANTE: Onde esta `<USER>` coloco o nome do meu usuário.
 
-**(2)** - Crio um novo arquivo `.xinitrc` (fazendo backup do mesmo caso exista) adicionando o `i3`
+**(2)** - Crio um novo arquivo `~/.xinitrc` (fazendo backup do mesmo caso exista) adicionando o `i3`
 para ser executado:
 
 ```shell
@@ -1080,7 +1088,7 @@ exec i3
 EOF
 ```
 
-**(3)** - Crio um novo arquivo `.zprofile` (fazendo backup do mesmo caso exista) e uma condição
+**(3)** - Crio um novo arquivo `~/.zprofile` (fazendo backup do mesmo caso exista) e uma condição
 apenas para logar automaticamente quando estiver no **tty1**:
 
 ```shell
