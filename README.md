@@ -981,6 +981,9 @@ cd /boot/EFI/Microsoft
 sbctl verify | sed 's/✗ /sbctl sign -s /e'
 ```
 
+> Nota: Para este passo ser realizado, primeiro tem que ter realizado o passo
+**Adicionando EFI do Windows (Opcional)**.
+
 </details></br>
 
 **(4)** - Reiniciar a máquina com o comando abaixo para entrar automaticamente na **BIOS**:
