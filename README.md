@@ -20,7 +20,7 @@ dano que sua máquina venha sofrer.
 
 # Preparação de Flash Drive
 
-Baixei a imagem do Arch Linux em [Arch Linux Download](https://archlinux.org/download/).
+Baixo a imagem do Arch Linux em [Arch Linux Download](https://archlinux.org/download/).
 Eu uso o BitTorrent para evitar corromper a imagem durante o download, e para gravar a imagem, se
 eu estiver no Linux, uso `dd` com o comando abaixo:
 
@@ -71,7 +71,7 @@ quit
 ```
 </details>
 
-> NOTA: Após configurar a internet, faço um `ping 8.8.8.8` para verificar. 😆
+> NOTA: Após configurar a internet, faço um `ping 8.8.8.8` para verificar.
 
 # Conexão SSH
 
@@ -120,16 +120,16 @@ em minha máquina.
 ## Boot
 
 O **Arch Linux** precisa apenas de uma partição de boot, a `/boot` do tipo **EFI System**,
-MAS, caso queira fazer um dual-boot com outras distros, que necessita de duas
+MAS, e quando queiro fazer um dual-boot com outras distros, que necessita de duas
 partições de boot separadas, uma `/boot` do tipo **Linux filesystems** e outra `/boot/efi` do tipo
-**EFI System**, por exemplo, **Fedora 42**, e queira COMPARTILHAR o bootloader, no caso o
-**systemd-boot** (que eu uso) entre ambas, então deve instalar o **Arch Linux** com a partição de
+**EFI System**, por exemplo, **Fedora 42**, e eu queira COMPARTILHAR o bootloader, no caso o
+**systemd-boot** (que eu uso) entre ambas, então instalo o **Arch Linux** com a partição de
 boot separada em duas também.
 
-Toda vez que o **Arch Linux** gera o "**vmlinuz-linux-lts**" e "**initramfs-linux-lts.img**", ele
-gera no diretorio `/boot`, isso porque a configuração padrão é para esté diretório, mas com a EFI
+Toda vez que o **Arch Linux** gera o "**vmlinuz-linux-lts**" e "**initramfs-linux-lts.img**" por exemplo, ele
+gera no diretório `/boot`, isso porque a configuração padrão é para este diretório, mas com a EFI
 apontando para `/boot/efi`, tive que modificar essa configuração no arquivo
-`/etc/mkinitcpio.d/linux-lts.preset` e reinstalar o kernel. Na seção de
+`/etc/mkinitcpio.d/linux-lts.preset` (kernel LTS) e reinstalar o kernel. Na seção de
 **Instalando o bootloader systemd-boot**, terá mais informações sobre essa modificação.
 
 * Sabendo disso, nesses guias NÃO VOU USAR duas partição de boot separadas porque não uso mais
@@ -194,8 +194,8 @@ terceiro comando, crio um volume lógico especificando o grupo (`linux`).
 cryptsetup -y -v luksFormat /dev/sdb1
 ```
 
-> IMPORTANTE!!! Se você já tem a unidade `/dev/mapper/home` criptografada com seus arquivos não tem
-necessidade deste passo **1** senão irá perder os arquivos. PULE para o passo **2**.
+> IMPORTANTE!!! Se tenho uma unidade `/dev/mapper/home` criptografada com meus arquivos, então não
+faço o passo **1**, senão irei perder meus dados/arquivos. PULO para o passo **2**.
 
 **(2)** - Criando/abrindo a unidade criptografada:
 
@@ -224,8 +224,8 @@ mkfs -t ext4 /dev/mapper/home;
 ```
 </details></br>
 
-> IMPORTANTE!!! Se já tiver a partição `/dev/mapper/home` com arquivos, não formatar senão perde
-TODOS os arquivos.
+> IMPORTANTE!!! Se tenho a partição `/dev/mapper/home` com arquivos, não formato senão irei perder
+TODOS meus dados/arquivos.
 
 Depois de todas unidades estarem criadas e formatadas, gosto de verificar com o comando: `lsblk -f`:
 
@@ -321,9 +321,9 @@ passwd
 # Configurando internet
 
 Como atualmente uso uma conexão via cabo, não tenho necessidade de usar o `NetworkManager` como
-gerenciador de conexão com internet para ficar me dando várias configurações insignificantes.
+gerenciador de conexão com internet para ficar me dando várias configurações que não uso.
 
-Eu apenas quero me conectar e pronto. Acho ele um pouco pesado em consumo de memória pra uma
+Eu apenas quero me conectar e pronto. Acho ele um pouco desnecessário em consumo de memória pra uma
 finalidade muito específica.
 
 Então, eu uso o `systemd-networkd` que é mais leve e objetivo.
