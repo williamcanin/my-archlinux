@@ -1099,3 +1099,9 @@ if [ -z "\$DISPLAY" ] && [ "\$XDG_VTNR" = 1 ]; then
 fi
 EOF
 ```
+
+# Conclusão
+
+Óbvio que faço muito mais otimizações e configurações no meu **Arch Linux**, mas esses são os passos
+e configurações BÁSICAS que uso. Espero que esse guia tenha te ajudado, e se ajudou, curta com uma
+estrelinha ⭐ aqui. Flw.
