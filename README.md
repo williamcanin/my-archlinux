@@ -588,7 +588,7 @@ pacman -S --noconfirm linux-lts
 ```
 
 <details>
-  <summary><strong>Usando modo tradicional</strong></summary>
+  <summary><strong>Usando modo tradicional (Opcional)</strong></summary>
 
 Aqui a configuração do systemd-boot muda, em vez de usar UKI, usa os arquivos
 **vmlinuz-linux-lts**, **initramfs-linux-lts.img** e **intel-ucode.img** da iniciar o boot.
@@ -624,6 +624,35 @@ EOF
 ```
 
 > Nota: Nas entradas de boot, em `options`, vale a mesma configuração do UKI.
+
+</details></br>
+
+<details>
+  <summary><strong>Adicionando EFI do Windows (Opcional)</strong></summary>
+
+Quando quero fazer um dual-boot com **Windows** ou até mesmo usar o Windows instalado em outra
+SSD/HDD, e  adicionar o mesmo no **systemd-boot**, eu faço os passos abaixo:
+
+**(1)** - Acho a partição de bootloader do Windows, por exemplo, **sdc1** e monto a mesma:
+
+```shell
+mount --mkdir /dev/sdc1 /mnt/winboot
+```
+
+**(2)** - Depois eu copio a pasta **Microsoft** para meu `/boot/EFI`:
+
+```shell
+cp -r /mnt/winboot/EFI/Microsoft /boot/${ESP_DIR}EFI
+```
+
+**(3)** - Crio o arquivo de entrada para o **Windows**:
+
+```shell
+cat << EOF > /boot/${ESP_DIR}loader/entries/windows.conf
+title   Windows 11
+efi     /EFI/Microsoft/Boot/bootmgfw.efi
+EOF
+```
 
 </details></br>
 
@@ -939,6 +968,20 @@ sbctl sign -s /boot/EFI/Linux/arch-linux-lts.efi
 sbctl sign -s /boot/EFI/Linux/arch-linux-lts-fallback.efi
 sbctl verify
 ```
+
+<details>
+  <summary><strong>Assinando EFI Windows</strong></summary>
+
+A EFI do Windows existe muitos arquivo que devem ser assinados, por isso, faço da seguinte maneira
+retirado do própria [Wiki do Arch Linux](https://wiki.archlinux.org/title/Unified_Extensible_Firmware_Interface/Secure_Boot#Assisted_process_with_sbctl):
+
+
+```shell
+cd /boot/EFI/Microsoft
+sbctl verify | sed 's/✗ /sbctl sign -s /e'
+```
+
+</details></br>
 
 **(4)** - Reiniciar a máquina com o comando abaixo para entrar automaticamente na **BIOS**:
 
