@@ -120,7 +120,7 @@ em minha máquina.
 ## Boot
 
 O **Arch Linux** precisa apenas de uma partição de boot, a `/boot` do tipo **EFI System**,
-MAS, e quando queiro fazer um dual-boot com outras distros, que necessita de duas
+MAS, quando quero fazer um dual-boot com outras distros, que necessita de duas
 partições de boot separadas, uma `/boot` do tipo **Linux filesystems** e outra `/boot/efi` do tipo
 **EFI System**, por exemplo, **Fedora 42**, e eu queira COMPARTILHAR o bootloader, no caso o
 **systemd-boot** (que eu uso) entre ambas, então instalo o **Arch Linux** com a partição de
