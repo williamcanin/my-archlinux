@@ -447,7 +447,7 @@ parâmetro **-a** significa **append**, adicionar, se emitir ele, irá sobrescre
 **(1)** - Aqui adiciono os módulos que preciso que carreguem durante o boot:
 
 ```shell
-sed -i "s|^MODULES=.*|MODULES=(usbhid xhci_hcd ehci_hcd)|g" /etc/mkinitcpio.conf
+sed -i "s|^MODULES=.*|MODULES=(xhci_hcd ehci_hcd uhci_hcd usbhid)|g" /etc/mkinitcpio.conf
 ```
 
 O driver `usbhid` é essencial para reconhecer dispositivos como teclados e mouses que se conectam
