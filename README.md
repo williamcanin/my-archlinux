@@ -11,7 +11,7 @@ minha máquina.
 
 Este guia irá ter detalhes e comentários RESUMIDO de cada comando, caso queira um guia com apenas os
 comandos, sem muita "verbosidade" de comentários, use este outro guia que fiz em modo `.txt`:
-[https://bit.ly/archlinux_installation](https://bit.ly/archlinux_installation).
+[archlinux_installation.txt](https://williamcanin.github.io/docs/raw/archlinux_installation.txt).
 
 > NOTA: Nesses guias, talvez nem tudo sirva para seu gosto e/ou suporte de sua máquina, então se
 for usar algo, tenha consciência se é compatível com seu setup. Não me responsabilizo por qualquer
